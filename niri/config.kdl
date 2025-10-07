@@ -16,7 +16,7 @@ input {
     keyboard {
         xkb {
             layout "us"
-            options "caps:escape"
+            options "caps:escape,altwin:swap_alt_win"
         }
     }
 
@@ -118,7 +118,7 @@ binds {
     MOD+SHIFT+CTRL+DOWN                 { move-column-to-monitor-down; }
 
     // Workspace Management
-    MOD+ESCAPE                          hotkey-overlay-title="Open Overview" repeat=false { toggle-overview; }
+    MOD+ESCAPE                        hotkey-overlay-title="Open Overview" repeat=false { toggle-overview; }
     MOD+WHEELSCROLLDOWN                 cooldown-ms=150 { focus-workspace-down; }
     MOD+WHEELSCROLLUP                   cooldown-ms=150 { focus-workspace-up; }
 
