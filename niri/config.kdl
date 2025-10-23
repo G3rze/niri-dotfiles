@@ -2,6 +2,7 @@
 spawn-sh-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "waybar"
+spawn-at-startup "sh" "-c" "vicinae server &"
 
 // General Settings
 prefer-no-csd
@@ -56,12 +57,12 @@ binds {
 
     // Application Shortcuts
     MOD+RETURN                          hotkey-overlay-title="Open Terminal: alacritty" { spawn-sh "alacritty"; }
-    MOD+A                               hotkey-overlay-title="Open App Launcher: rofi" { spawn-sh "$HOME/.config/rofi/launcher/launcher.sh"; }
-    MOD+B                               hotkey-overlay-title="Open Browser: firefox" { spawn-sh "firefox"; }
+    MOD+A                               hotkey-overlay-title="Open App Launcher: vicinae" { spawn-sh "vicinae toggle"; }
+    MOD+B                               hotkey-overlay-title="Open Browser: firefox" { spawn-sh "firefox-developer-edition"; }
     MOD+ALT+L                           hotkey-overlay-title="Lock Screen: swaylock" { spawn-sh "swaylock"; }
     MOD+E                               hotkey-overlay-title="File Manager: Thunar" { spawn-sh "thunar"; }
-    CTRL+ALT+ESCAPE                     hotkey-overlay-title="Power Menu: rofi" { spawn-sh "$HOME/.config/rofi/powermenu/powermenu.sh"; }
-    MOD+CTRL+W                          hotkey-overlay-title="Open Wallpaper Selector: rofi" { spawn-sh "$HOME/.config/rofi/bgselector/bgselector.sh"; }
+    MOD+W                               hotkey-overlay-title="Open Wallpaper Selector: rofi" { spawn-sh "$HOME/.config/rofi/bgselector/bgselector.sh"; }
+    MOD+O                               hotkey-overlay-title="Keyboard Mouse: wl-kbptr" { spawn-sh "pgrep -x wl-kbptr >/dev/null || wl-kbptr &"; }
 
     // Media Keys
     XF86AudioRaiseVolume                allow-when-locked=true { spawn-sh "mediactl volume_up"; }
@@ -118,7 +119,7 @@ binds {
     MOD+SHIFT+CTRL+DOWN                 { move-column-to-monitor-down; }
 
     // Workspace Management
-    MOD+ESCAPE                        hotkey-overlay-title="Open Overview" repeat=false { toggle-overview; }
+    MOD+ESCAPE                          hotkey-overlay-title="Open Overview" repeat=false { toggle-overview; }
     MOD+WHEELSCROLLDOWN                 cooldown-ms=150 { focus-workspace-down; }
     MOD+WHEELSCROLLUP                   cooldown-ms=150 { focus-workspace-up; }
 
@@ -171,7 +172,7 @@ binds {
     // Window Modes
     MOD+T                               { toggle-window-floating; }
     MOD+F                               { fullscreen-window; }
-    MOD+W                               { toggle-column-tabbed-display; }
+    // MOD+W                               { toggle-column-tabbed-display; }
     MOD+M                               { maximize-column; }
 
     // Utils
