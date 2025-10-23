@@ -12,10 +12,10 @@
         "searchFiles": false
     },
     "theme": {
-        "name": "catppuccin-mocha.json"
+        "name": "catppuccin-mocha"
     },
     "window": {
-        "csd": false,
+        "csd": true,
         "opacity": 1,
         "rounding": 0
     }

@@ -1,8 +1,8 @@
 configuration {
-    show-icons: true;
-    modi: "drun";
+  show-icons: true;
+  modi: "drun";
 
-    kb-primary-paste: "Control+V,Shift+Insert";
+  kb-primary-paste: "Control+V,Shift+Insert";
 	kb-secondary-paste: "Control+v,Insert";
 	kb-clear-line: "Control+w";
 	kb-move-front: "Control+a";
@@ -27,8 +27,8 @@ configuration {
 	kb-mode-complete: "Control+p";
 	kb-row-left: "h";
 	kb-row-right: "l";
-	kb-row-down: "j";
-	kb-row-up: "k";
+	kb-row-down: "Down,j";
+	kb-row-up: "Up,k";
 	kb-page-prev: "Page_Up";
 	kb-page-next: "Page_Down";
 	kb-row-first: "Home,KP_Home";
@@ -86,7 +86,7 @@ configuration {
 }
 
 window {
-    background-color: rgba(0,0,0,0.85);   // slightly stronger backdrop
+    background-color: rgba(0,0,0,1);   // slightly stronger backdrop
     fullscreen: true;
     border: 0px;
     separator: none;
@@ -122,10 +122,9 @@ listview {
 element {
     border-radius: 0px;                  // subtle rounded corners
     children: [element-icon];
-    background-color: transparent;
+    background-color: #000000;
     padding: 0px;
     margin: 0px;
-    transition: 200;                     // smooth hover/select animations
 }
 
 element.selected {
@@ -136,10 +135,10 @@ element.selected {
 }
 
 element-icon {
-    size: 330px 500px;                   // slightly refined proportions
+    size: 330px 509px;                   // slightly refined proportions
     horizontal-align: 0.5;
     vertical-align: 0.5;
-    background-color: transparent; 
-    expand: true;                     
-    scale: "fit";                     
+    background-color: #000000;
+    expand: true;
+    scale: "fit";
 }
