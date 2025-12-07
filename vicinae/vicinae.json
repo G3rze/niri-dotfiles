@@ -3,7 +3,7 @@
     "considerPreedit": false,
     "faviconService": "google",
     "font": {
-        "size": 10.5
+        "size": 11
     },
     "keybinding": "default",
     "keybinds": {
@@ -13,7 +13,7 @@
         "searchFiles": true
     },
     "theme": {
-        "name": "catppuccin-mocha"
+        "name": "wallust"
     },
     "window": {
         "csd": true,
