@@ -65,7 +65,7 @@ The automated installer will:
 ```
 Installation Time: Approximately 15-30 minutes depending on your internet speed.
 
- What Gets Installed
+# What Gets Installed
  
 Core Components
 
