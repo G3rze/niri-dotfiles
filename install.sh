@@ -54,6 +54,7 @@ readonly AUR_PACKAGES=(
   pavucontrol
   thunar
   minizip
+  awww-git
 )
 
 # Official repository packages
@@ -61,7 +62,7 @@ readonly PACMAN_PACKAGES=(
   niri waybar fish fastfetch mako alacritty kitty starship neovim yazi
   zathura zathura-pdf-mupdf ttf-jetbrains-mono-nerd 
   qt5-wayland qt6-wayland polkit-gnome ffmpeg imagemagick unzip jq
-  swww gtklock rofi curl libnotify
+  gtklock rofi curl libnotify
 )
 
 # ==========================
@@ -769,7 +770,7 @@ verify_all_binaries() {
   local missing_binaries=()
   local binaries_to_check=(
     niri waybar fish fastfetch mako alacritty kitty starship
-    nvim yazi vicinae gtklock zathura wallust swww rofi
+    nvim yazi vicinae gtklock zathura wallust awww rofi
   )
 
   for binary in "${binaries_to_check[@]}"; do
@@ -1101,7 +1102,7 @@ create_systemd_services() {
   info "Niri handles autostart via its config file."
   info "The following services are started by niri.conf:"
   printf "  - polkit-gnome-authentication-agent\n"
-  printf "  - swww-daemon\n"
+  printf "  - awww-daemon\n"
   printf "  - waybar\n"
   printf "  - vicinae server\n"
   printf "\n"
@@ -1189,7 +1190,7 @@ EOF
   printf "\n"
   printf "${BLUE}${BOLD}Important Notes:${NC}\n"
   printf "  • Services are auto-started by niri.conf, not systemd\n"
-  printf "  • swww-daemon, waybar, vicinae, and polkit start automatically\n"
+  printf "  • awww-daemon, waybar, vicinae, and polkit start automatically\n"
   printf "  • gtklock can be triggered manually or via idle timeout\n"
   printf "\n"
 

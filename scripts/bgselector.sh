@@ -25,32 +25,68 @@ fi
 # Generate thumbnails with validation
 progress_file=$(mktemp)
 touch "$progress_file"
+
+# Use all available CPU cores for parallel processing
+max_jobs=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
 job_count=0
 
+# Create list of images that need thumbnails
+to_generate=$(mktemp)
 while read -r img; do
     rel_path="${img#$WALL_DIR/}"
     cache_name="${rel_path//\//_}"
     cache_name="${cache_name%.*}.jpg"
     cache_file="$CACHE_DIR/$cache_name"
     
-    [ -f "$cache_file" ] && continue
-    
-    (
-        if [[ "$img" =~ \.(gif|GIF)$ ]]; then
-            magick "$img[0]" -strip -thumbnail 330x540^ -gravity center -extent 330x540 -quality 80 +repage "$cache_file" 2>/dev/null
-        else
-            magick "$img" -strip -thumbnail 330x540^ -gravity center -extent 330x540 -quality 80 +repage "$cache_file" 2>/dev/null
-        fi
-        [ -f "$cache_file" ] && echo "1" >> "$progress_file"
-    ) &
-    
-    ((job_count++))
-    if [ $((job_count % 4)) -eq 0 ]; then
-        wait -n
-    fi
+    [ -f "$cache_file" ] || echo "$img" >> "$to_generate"
 done < "$current_index"
 
-wait
+# Process images in parallel
+generate_thumbnail() {
+    local img="$1"
+    local cache_dir="$2"
+    local wall_dir="$3"
+    local progress="$4"
+    
+    local rel_path="${img#$wall_dir/}"
+    local cache_name="${rel_path//\//_}"
+    cache_name="${cache_name%.*}.jpg"
+    local cache_file="$cache_dir/$cache_name"
+    
+    # Optimized magick with faster settings:
+    # -define jpeg:size= hints decoder to not decode full res
+    # -filter Triangle is faster than default Lanczos
+    # -limit memory/map constrains resource usage per job
+    if [[ "$img" =~ \.(gif|GIF)$ ]]; then
+        magick "$img[0]" -define jpeg:size=660x1080 -filter Triangle -strip \
+            -thumbnail 330x540^ -gravity center -extent 330x540 \
+            -quality 80 +repage "$cache_file" 2>/dev/null
+    else
+        magick "$img" -define jpeg:size=660x1080 -filter Triangle -strip \
+            -thumbnail 330x540^ -gravity center -extent 330x540 \
+            -quality 80 +repage "$cache_file" 2>/dev/null
+    fi
+    [ -f "$cache_file" ] && echo "1" >> "$progress"
+}
+export -f generate_thumbnail
+
+# Use xargs for efficient parallel execution if available, fallback to bash loop
+if command -v xargs >/dev/null 2>&1 && [ -s "$to_generate" ]; then
+    cat "$to_generate" | xargs -P "$max_jobs" -I {} bash -c \
+        'generate_thumbnail "$1" "$2" "$3" "$4"' _ {} "$CACHE_DIR" "$WALL_DIR" "$progress_file"
+elif [ -s "$to_generate" ]; then
+    # Fallback: manual parallel with all cores
+    while read -r img; do
+        generate_thumbnail "$img" "$CACHE_DIR" "$WALL_DIR" "$progress_file" &
+        ((job_count++))
+        if [ $((job_count % max_jobs)) -eq 0 ]; then
+            wait -n 2>/dev/null || wait
+        fi
+    done < "$to_generate"
+    wait
+fi
+
+rm -f "$to_generate"
 
 total_generated=$(wc -l < "$progress_file" 2>/dev/null || echo 0)
 [ $total_generated -gt 0 ] && echo "Generated $total_generated thumbnails" || echo "Cache up to date"
@@ -78,7 +114,7 @@ rm "$rofi_input"
 if [ -n "$selected" ]; then
     selected_path="$WALL_DIR/$selected"
     if [ -f "$selected_path" ]; then
-        swww img "$selected_path" -t fade --transition-duration 2 --transition-fps 30 &
+        awww img "$selected_path" -t fade --transition-duration 2 --transition-fps 30 &
         sleep 0.2
         "$HOME/.config/scripts/theme-sync.sh" &
         wait

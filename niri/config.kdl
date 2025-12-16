@@ -1,9 +1,8 @@
 // Startup Applications
 spawn-sh-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &"
-spawn-at-startup "swww-daemon"
+spawn-at-startup "awww-daemon"
 spawn-at-startup "waybar"
 spawn-at-startup "sh" "-c" "vicinae server &"
-spawn-at-startup "niri-switch-daemon"
 
 // General Settings
 prefer-no-csd
@@ -48,7 +47,7 @@ overview {
 }
 
 layer-rule {
-    match namespace="^swww-daemon$"
+    match namespace="^awww-daemon$"
     place-within-backdrop true
 }
 
@@ -170,7 +169,6 @@ binds {
     MOD+SHIFT+9                         { move-column-to-workspace 9; }
 
     MOD+TAB                             { focus-workspace-previous; }
-    ALT+TAB                             { spawn "niri-switch"; }
 
     // Layout Controls
     MOD+C                               { center-column; }

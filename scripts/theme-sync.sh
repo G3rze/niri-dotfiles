@@ -1,8 +1,8 @@
 #!/bin/bash
 
-set -euo pipefail
+set -uo pipefail
 
-sleep 0.8 # let swww set the wallpaper
+sleep 0.8 # let awww set the wallpaper
 
 # Source common utilities if available
 if [[ -f "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh" ]]; then
@@ -296,10 +296,10 @@ detect_theme_from_wallpaper() {
   log_info "Detecting theme from current wallpaper directory"
 
   local wallpaper_path
-  wallpaper_path=$(swww query 2> /dev/null | grep -oP '(?<=image: ).*' | head -n1 | tr -d '\n\r')
+  wallpaper_path=$(awww query 2> /dev/null | grep -oP '(?<=image: ).*' | head -n1 | tr -d '\n\r')
 
   if [[ -z "$wallpaper_path" ]]; then
-    die "No wallpaper detected from swww query"
+    die "No wallpaper detected from awww query"
   fi
 
   if [[ ! -f "$wallpaper_path" ]]; then
@@ -659,7 +659,7 @@ main() {
   log_info "Starting dynamic theme synchronization"
 
   # Validate dependencies
-  validate_dependencies "swww" "wallust" "jq" "sed" "grep" "head" "tr"
+  validate_dependencies "awww" "wallust" "jq" "sed" "grep" "head" "tr"
 
   # Detect theme from current wallpaper
   detect_theme_from_wallpaper
@@ -705,18 +705,17 @@ main() {
     run_wallust_theme "$wallust_theme" "$wallpaper_path"
     update_niri_config
     update_vscode_theme
-    vicinae theme set wallust
+
+    if command -v vicinae > /dev/null 2>&1; then
+      vicinae theme set wallust || log_warn "Failed to set vicinae theme"
+    else
+      log_warn "vicinae not found, skipping vicinae theme update"
+    fi
+
     if command -v makoctl > /dev/null 2>&1; then
       makoctl reload 2> /dev/null || log_warn "Failed to reload mako"
     else
       log_warn "makoctl not available, skipping notification daemon reload"
-    fi
-
-    if command -v niri-switch-daemon > /dev/null 2>&1; then
-      pkill -f niri-switch-daemon || true
-      sleep 0.5
-      niri-switch-daemon > /dev/null 2>&1 &
-      log_info "Restarted niri-switch-daemon"
     fi
 
     save_theme_state "$detected_theme" "$wallpaper_variation"
