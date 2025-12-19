@@ -537,9 +537,14 @@ choose_aur_helper() {
   info "Checking for AUR helper..."
 
   if command -v yay &> /dev/null; then
-    AUR_HELPER="yay"
-    msg "yay AUR helper already installed."
-    return 0
+    if yay --version &> /dev/null; then
+      AUR_HELPER="yay"
+      msg "yay AUR helper detected and working."
+      return 0
+    else
+      warn "yay is installed but broken (likely due to pacman/libalpm upgrade). Reinstalling..."
+      sudo pacman -Rns --noconfirm yay >> "${LOG_FILE}" 2>&1 || true
+    fi
   fi
 
   AUR_HELPER="yay"
@@ -1365,13 +1370,13 @@ main() {
   update_system
   add_summary "System packages updated"
 
-  step "Installing Base Development Tools"
-  install_base_tools
-  add_summary "Base development tools installed (git, base-devel, curl)"
-
   step "AUR Helper Selection and Installation"
   choose_aur_helper
   add_summary "AUR helper configured: ${AUR_HELPER}"
+
+  step "Installing Base Development Tools"
+  install_base_tools
+  add_summary "Base development tools installed (git, base-devel, curl)"
 
   step "Configuring Rust Toolchain"
   cargo_fix
