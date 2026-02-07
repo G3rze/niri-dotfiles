@@ -214,12 +214,12 @@ layout {
 
     focus-ring {
         width 0
-        active-color "#1E1E2E"
+        active-color "#282828"
     }
 
     insert-hint {
         off
-        color "#1E1E2E"
+        color "#282828"
     }
 
     struts {}

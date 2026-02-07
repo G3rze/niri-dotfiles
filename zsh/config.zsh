@@ -17,6 +17,11 @@ for p in ~/.local/bin ~/Applications/depot_tools; do
   fi
 done
 
+# Start Niri automatically when logging in on tty1 without a running GUI session.
+if [[ -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" ]] && [[ "$(tty)" == "/dev/tty1" ]]; then
+  exec dbus-run-session niri
+fi
+
 ######################
 ### Key Bindings  ####
 ######################

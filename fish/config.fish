@@ -28,6 +28,13 @@ for p in $HOME/.local/bin $HOME/Applications/depot_tools
     end
 end
 
+# Start Niri automatically when logging in on tty1 without a running GUI session.
+if status is-interactive
+    if test -z "$DISPLAY"; and test -z "$WAYLAND_DISPLAY"; and test (tty) = "/dev/tty1"
+        exec dbus-run-session niri
+    end
+end
+
 #####################
 ### Key Bindings  ###
 #####################

@@ -1454,8 +1454,8 @@ EOF
   separator
   printf "${MAGENTA}${BOLD}Next Steps:${NC}\n"
   printf "  1. Log out of your current session\n"
-  printf "  2. Select 'Niri' from your display manager\n"
-  printf "  3. Log in to start using your new setup\n"
+  printf "  2. Switch to a TTY (for example: Ctrl+Alt+F2)\n"
+  printf "  3. Log in and start Niri with: dbus-run-session niri\n"
   printf "\n"
   printf "${BLUE}${BOLD}Important Notes:${NC}\n"
   printf "  • Services are auto-started by niri.conf, not systemd\n"
