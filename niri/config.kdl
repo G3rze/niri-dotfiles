@@ -56,12 +56,12 @@ binds {
     MOD+SHIFT+ESCAPE                    { show-hotkey-overlay; }
 
     // Application Shortcuts
-    MOD+RETURN                          hotkey-overlay-title="Open Terminal: alacritty" { spawn-sh "alacritty"; }
-    MOD+ALT+RETURN                      hotkey-overlay-title="Open Terminal: kitty" { spawn-sh "kitty"; }
+    MOD+RETURN                          hotkey-overlay-title="Open Terminal: kitty" { spawn-sh "kitty"; }
+    MOD+ALT+RETURN                      hotkey-overlay-title="Open Terminal: alacritty" { spawn-sh "alacritty"; }
     MOD+ALT+B                         hotkey-overlay-title="Open Secondary Browser: chrome" { spawn-sh "google-chrome-stable --enable-features=TouchpadOverscrollHistoryNavigation"; }
     MOD+SHIFT+Q                         hotkey-overlay-title="Lock Screen: gtklock" { spawn-sh "gtklock"; }
     MOD+A                               hotkey-overlay-title="Open App Launcher: rofi" { spawn-sh "rofi -show drun"; }
-    CTRL+B                              hotkey-overlay-title="Open Browser: zen-browser" { spawn-sh "zen-browser"; }
+    MOD+B                              hotkey-overlay-title="Open Browser: zen-browser" { spawn-sh "zen-browser"; }
     MOD+E                               hotkey-overlay-title="File Manager: Thunar" { spawn-sh "thunar"; }
     MOD+ALT+E                           hotkey-overlay-title="File Manager: Yazi" { spawn-sh "yazi"; }
     MOD+W                               hotkey-overlay-title="Open Wallpaper Selector" { spawn-sh "$HOME/.config/scripts/bgselector.sh"; }
@@ -75,7 +75,7 @@ binds {
     XF86AudioMicMute                    allow-when-locked=true { spawn-sh "mediactl mic_mute"; }
     XF86AudioNext                       allow-when-locked=true { spawn-sh "mediactl next_track"; }
     XF86AudioPause                      allow-when-locked=true { spawn-sh "mediactl play_pause"; }
-    XF86AudioPlay                       allow-when-locked=true { spawn-sh "mediactl play_pausse"; }
+    XF86AudioPlay                       allow-when-locked=true { spawn-sh "mediactl play_pause"; }
     XF86AudioPrev                       allow-when-locked=true { spawn-sh "mediactl prev_track"; }
 
     // Window Management
@@ -214,12 +214,12 @@ layout {
 
     focus-ring {
         width 0
-        active-color "#282828"
+        active-color "#1E1E2E"
     }
 
     insert-hint {
         off
-        color "#282828"
+        color "#1E1E2E"
     }
 
     struts {}
@@ -265,12 +265,6 @@ animations {
 window-rule {
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
     open-floating true
-}
-
-// Alacritty always translucent
-window-rule {
-    match app-id="^Alacritty$"
-    opacity 0.8
 }
 
 window-rule {
@@ -372,10 +366,15 @@ window-rule {
     clip-to-geometry true
 }
 
-// Inactive window transparency
 window-rule {
     match is-active=false
-    opacity 0.9
+    opacity 0.75
+}
+
+// Avoid opaque border/background interaction on terminal windows
+window-rule {
+    match app-id=r#"^(Alacritty|alacritty|kitty|Kitty)$"#
+    draw-border-with-background false
 }
 
 // Environment Variables

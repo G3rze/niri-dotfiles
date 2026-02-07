@@ -718,6 +718,15 @@ main() {
       log_warn "makoctl not available, skipping notification daemon reload"
     fi
 
+    if command -v rmpc > /dev/null 2>&1; then
+      if pgrep -x rmpc > /dev/null 2>&1; then
+        rmpc remote set theme "$HOME/.config/rmpc/themes/wallust.ron" 2> /dev/null ||
+          log_warn "Failed to apply updated rmpc wallust theme to running instance"
+      fi
+    else
+      log_warn "rmpc not found, skipping live rmpc theme reload"
+    fi
+
     save_theme_state "$detected_theme" "$wallpaper_variation"
 
     log_success "Dynamic theme synchronization completed successfully"
@@ -731,4 +740,3 @@ main() {
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   main "$@"
 fi
-

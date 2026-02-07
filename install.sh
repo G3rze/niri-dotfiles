@@ -8,7 +8,7 @@ IFS=$'\n\t'
 # ==========================
 
 readonly REPO_URL="https://github.com/G3rze/niri-dotfiles.git"
-readonly DOTDIR="${HOME}/.dotfiles-sevens"
+readonly DOTDIR="${DOTDIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 readonly CONFIG_DIR="${HOME}/.config"
 readonly BACKUP_DIR="${HOME}/.config_backup_$(date +%Y%m%d_%H%M%S)"
 readonly LOG_DIR="${HOME}/.cache"
@@ -63,6 +63,7 @@ readonly AUR_PACKAGES=(
 readonly PACMAN_PACKAGES=(
   niri waybar fish fastfetch mako alacritty kitty starship neovim yazi
   zathura zathura-pdf-mupdf ttf-jetbrains-mono-nerd
+  noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
   qt5-wayland qt6-wayland polkit-gnome ffmpeg imagemagick unzip jq
   gtklock rofi curl libnotify
 )
@@ -1123,12 +1124,15 @@ set_default_shell() {
 # ==========================
 
 clone_or_update_dotfiles() {
-  if [[ -d "${DOTDIR}/.git" ]]; then
+  local -r script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  # If running from the repo itself, do not clone/update elsewhere.
+  if [[ "${DOTDIR}" == "${script_dir}" ]]; then
+    msg "Using local dotfiles repo at ${DOTDIR} (skipping clone/update)."
+  elif [[ -d "${DOTDIR}/.git" ]]; then
     msg "Dotfiles directory exists. Updating..."
     if ! retry_command 3 git -C "${DOTDIR}" pull --rebase >> "${LOG_FILE}" 2>&1; then
-      warn "Failed to update dotfiles after retries. Removing and re-cloning..."
-      rm -rf "${DOTDIR}"
-      clone_dotfiles
+      warn "Failed to update dotfiles after retries. Keeping existing repo."
     else
       msg "Dotfiles updated successfully."
     fi
@@ -1140,11 +1144,13 @@ clone_or_update_dotfiles() {
     clone_dotfiles
   fi
 
-  info "Updating git submodules..."
-  if retry_command 3 git -C "${DOTDIR}" submodule update --init --recursive >> "${LOG_FILE}" 2>&1; then
-    msg "Submodules updated."
-  else
-    warn "Failed to update submodules after retries. Continuing anyway..."
+  if [[ -d "${DOTDIR}/.git" ]]; then
+    info "Updating git submodules..."
+    if retry_command 3 git -C "${DOTDIR}" submodule update --init --recursive >> "${LOG_FILE}" 2>&1; then
+      msg "Submodules updated."
+    else
+      warn "Failed to update submodules after retries. Continuing anyway..."
+    fi
   fi
 }
 

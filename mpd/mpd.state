@@ -1,0 +1,22 @@
+sw_volume: 67
+audio_device_state:1:MPD Pipewire Output
+state: play
+current: 4
+time: 120.058
+random: 0
+repeat: 0
+single: 0
+consume: 0
+crossfade: 0
+mixrampdb: 0
+mixrampdelay: -1
+lastloadedplaylist: 
+playlist_begin
+0:Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/01 オドループ.flac
+1:Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/02 ディスコプール.flac
+2:Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/03 幸せっていう怪物.flac
+3:Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/04 砂利道.flac
+4:Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/05 もう帰る汽船.flac
+5:Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/06 うわさのケムリの女の子.flac
+6:Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/07 人魚のはなし.flac
+playlist_end

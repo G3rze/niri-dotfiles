@@ -56,5 +56,15 @@
 				}
 			]
 		}
-	}
+	},
+	"survey": {
+		"2": {
+			"time": 1770436944
+		}
+	},
+	"multichatsOnboarding": true,
+	"highlights": {
+		"createSpace": true
+	},
+	"whatsNew": false
 }
