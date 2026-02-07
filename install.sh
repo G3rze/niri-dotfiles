@@ -37,7 +37,7 @@ SUDO_PID=""
 # Expected configuration folders in the repo
 readonly CONFIG_FOLDERS=(
   niri waybar fish zsh fastfetch mako alacritty kitty starship
-  nvim yazi vicinae gtklock zathura wallust rofi scripts
+  nvim yazi gtklock zathura wallust rofi scripts mpd rmpc waydroid anytype
 )
 
 # Optional dependencies that waybar modules depend on
@@ -46,7 +46,8 @@ readonly OPTIONAL_BLUETOOTH_PACKAGES=("bluez" "bluez-utils")
 
 # AUR packages to install
 readonly AUR_PACKAGES=(
-  vicinae-bin
+  anytype-bin
+  zen-browser-bin
   wallust
   dust
   eza
@@ -904,7 +905,7 @@ verify_all_binaries() {
   local missing_binaries=()
   local binaries_to_check=(
     niri waybar fish fastfetch mako alacritty kitty starship
-    nvim yazi vicinae gtklock zathura wallust awww rofi
+    nvim yazi gtklock zathura wallust awww rofi mpd rmpc waydroid
   )
 
   for binary in "${binaries_to_check[@]}"; do
@@ -1247,7 +1248,6 @@ create_systemd_services() {
   printf "  - polkit-gnome-authentication-agent\n"
   printf "  - awww-daemon\n"
   printf "  - waybar\n"
-  printf "  - vicinae server\n"
   printf "\n"
   info "Creating gtklock service for manual/idle trigger only..."
 
@@ -1262,8 +1262,121 @@ create_systemd_services() {
   info "To manually lock your screen: systemctl --user start gtklock"
   info "To enable autostart on login: systemctl --user enable gtklock"
   printf "\n"
-   
+
+  info "Enabling user mpd service..."
+  if systemctl --user enable --now mpd >> "${LOG_FILE}" 2>&1; then
+    add_summary "mpd user service enabled"
+  else
+    warn "Failed to enable/start mpd user service."
+  fi
+
+  local reply
+  read -r -p "Enable Waydroid (container service)? (y/N): " reply < /dev/tty
+  if [[ "${reply}" =~ ^[Yy]$ ]]; then
+    if verify_binary waydroid; then
+      if [[ ! -f "/var/lib/waydroid/waydroid.cfg" ]]; then
+        info "Waydroid is not initialized."
+        read -r -p "Initialize Waydroid with Google Apps (waydroid init -s GAPPS)? (y/N): " reply < /dev/tty
+        if [[ "${reply}" =~ ^[Yy]$ ]]; then
+          if sudo waydroid init -s GAPPS >> "${LOG_FILE}" 2>&1; then
+            add_summary "waydroid initialized with GAPPS"
+          else
+            warn "Waydroid init failed. You can run: sudo waydroid init -s GAPPS"
+          fi
+        else
+          warn "Skipping Waydroid init. You can run: sudo waydroid init -s GAPPS"
+        fi
+      fi
+    else
+      warn "Waydroid not installed, skipping init."
+    fi
+
+    info "Enabling waydroid system service..."
+    if sudo systemctl enable --now waydroid-container >> "${LOG_FILE}" 2>&1; then
+      add_summary "waydroid-container service enabled"
+    else
+      warn "Failed to enable/start waydroid-container. You may need to install Waydroid or start it manually."
+    fi
+  else
+    info "Skipping Waydroid service enable."
+  fi
+
+  read -r -p "Install and enable Syncthing (user service)? (y/N): " reply < /dev/tty
+  if [[ "${reply}" =~ ^[Yy]$ ]]; then
+    if ! verify_binary syncthing; then
+      info "Installing syncthing..."
+      if sudo pacman -S --needed --noconfirm syncthing >> "${LOG_FILE}" 2>&1; then
+        add_summary "syncthing installed"
+      else
+        warn "Failed to install syncthing."
+      fi
+    fi
+    info "Enabling syncthing user service..."
+    if systemctl --user enable --now syncthing >> "${LOG_FILE}" 2>&1; then
+      add_summary "syncthing user service enabled"
+    else
+      warn "Failed to enable/start syncthing user service."
+    fi
+  else
+    info "Skipping Syncthing."
+  fi
+
   msg "Systemd services configured."
+}
+
+install_dev_tools() {
+  local reply
+  read -r -p "Install optional developer tools (nvm, Node LTS, OpenJDK)? (y/N): " reply < /dev/tty
+  if [[ ! "${reply}" =~ ^[Yy]$ ]]; then
+    info "Skipping developer tools."
+    return
+  fi
+
+  info "Installing nvm..."
+  if curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash >> "${LOG_FILE}" 2>&1; then
+    add_summary "nvm installed"
+  else
+    warn "nvm install failed."
+  fi
+
+  export NVM_DIR="${HOME}/.nvm"
+  if [[ -s "${NVM_DIR}/nvm.sh" ]]; then
+    # shellcheck disable=SC1090
+    . "${NVM_DIR}/nvm.sh"
+    info "Installing latest Node.js LTS via nvm..."
+    if nvm install --lts >> "${LOG_FILE}" 2>&1; then
+      add_summary "Node.js LTS installed (nvm)"
+    else
+      warn "Node.js LTS install failed."
+    fi
+  else
+    warn "nvm not found after install; skipping Node.js LTS."
+  fi
+
+  info "Installing OpenJDK..."
+  if sudo pacman -S --needed --noconfirm jdk-openjdk >> "${LOG_FILE}" 2>&1; then
+    add_summary "OpenJDK installed"
+  else
+    warn "OpenJDK install failed."
+  fi
+
+  printf "\n"
+  info "OpenAI Codex CLI install is optional."
+  info "Requires ChatGPT Plus or a valid OpenAI API key."
+  read -r -p "Install OpenAI Codex CLI (npm i -g @openai/codex)? (y/N): " reply < /dev/tty
+  if [[ "${reply}" =~ ^[Yy]$ ]]; then
+    if command -v npm >/dev/null 2>&1; then
+      if npm i -g @openai/codex >> "${LOG_FILE}" 2>&1; then
+        add_summary "OpenAI Codex CLI installed"
+      else
+        warn "Codex CLI install failed."
+      fi
+    else
+      warn "npm not found; cannot install Codex CLI."
+    fi
+  else
+    info "Skipping Codex CLI."
+  fi
 }
 
 create_gtklock_service() {
@@ -1340,7 +1453,10 @@ EOF
   printf "\n"
   printf "${BLUE}${BOLD}Important Notes:${NC}\n"
   printf "  • Services are auto-started by niri.conf, not systemd\n"
-  printf "  • awww-daemon, waybar, vicinae, and polkit start automatically\n"
+  printf "  • awww-daemon, waybar, and polkit start automatically\n"
+  printf "  • mpd is enabled as a user service\n"
+  printf "  • waydroid-container can be enabled during install (optional)\n"
+  printf "  • syncthing can be installed/enabled during install (optional)\n"
   printf "  • gtklock can be triggered manually or via idle timeout\n"
   printf "\n"
 
@@ -1414,7 +1530,7 @@ main() {
 
   step "Installing AUR Packages"
   install_aur_packages
-  add_summary "AUR packages installed (vicinae, wallust)"
+  add_summary "AUR packages installed (wallust)"
 
   step "Installing GTK Themes"
   install_gtk_themes
@@ -1455,6 +1571,10 @@ main() {
   step "Installing Wallpapers"
   install_wallpapers
   add_summary "Wallpapers installed to ~/Pictures/Wallpapers"
+
+  step "Optional Developer Tools"
+  install_dev_tools
+  add_summary "Optional developer tools processed"
 
   step "Configuring System Services"
   create_systemd_services

@@ -1,0 +1,722 @@
+[2026-02-06 18:17:22.238] [error] [Api].linuxDistro: pify(...).then is not a function
+[2026-02-06 18:27:19.973] [info]  Checking for update
+[2026-02-06 18:27:19.974] [info]  Checking for update
+[2026-02-06 18:27:19.983] [info]  Generated new staging user ID: 7ee1d9c5-5138-598c-a540-08a39516a9d8
+[2026-02-06 18:27:20.557] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 18:27:20.558] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 18:27:20.558] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 18:37:19.993] [info]  Checking for update
+[2026-02-06 18:37:19.994] [info]  Checking for update
+[2026-02-06 18:37:20.559] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 18:37:20.559] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 18:37:20.559] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 18:47:20.005] [info]  Checking for update
+[2026-02-06 18:47:20.014] [info]  Checking for update
+[2026-02-06 18:47:20.626] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 18:47:20.626] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 18:47:20.626] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 18:57:20.017] [info]  Checking for update
+[2026-02-06 18:57:20.017] [info]  Checking for update
+[2026-02-06 18:57:20.643] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 18:57:20.643] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 18:57:20.643] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 19:07:20.035] [info]  Checking for update
+[2026-02-06 19:07:20.035] [info]  Checking for update
+[2026-02-06 19:07:20.694] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 19:07:20.694] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 19:07:20.694] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 19:17:20.054] [info]  Checking for update
+[2026-02-06 19:17:20.054] [info]  Checking for update
+[2026-02-06 19:17:20.652] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 19:17:20.652] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 19:17:20.652] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 19:27:20.072] [info]  Checking for update
+[2026-02-06 19:27:20.073] [info]  Checking for update
+[2026-02-06 19:27:20.868] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 19:27:20.868] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 19:27:20.868] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 19:37:20.074] [info]  Checking for update
+[2026-02-06 19:37:20.074] [info]  Checking for update
+[2026-02-06 19:37:20.732] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 19:37:20.732] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 19:37:20.732] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 19:47:20.093] [info]  Checking for update
+[2026-02-06 19:47:20.093] [info]  Checking for update
+[2026-02-06 19:47:20.677] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 19:47:20.677] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 19:47:20.677] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 19:57:20.111] [info]  Checking for update
+[2026-02-06 19:57:20.111] [info]  Checking for update
+[2026-02-06 19:57:21.837] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 19:57:21.837] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 19:57:21.837] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 20:07:20.122] [info]  Checking for update
+[2026-02-06 20:07:20.122] [info]  Checking for update
+[2026-02-06 20:07:20.740] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 20:07:20.740] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 20:07:20.740] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 20:17:20.124] [info]  Checking for update
+[2026-02-06 20:17:20.124] [info]  Checking for update
+[2026-02-06 20:17:20.808] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 20:17:20.808] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 20:17:20.809] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 20:27:20.142] [info]  Checking for update
+[2026-02-06 20:27:20.142] [info]  Checking for update
+[2026-02-06 20:27:20.773] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 20:27:20.773] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 20:27:20.774] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 20:37:20.153] [info]  Checking for update
+[2026-02-06 20:37:20.153] [info]  Checking for update
+[2026-02-06 20:37:20.716] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 20:37:20.716] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 20:37:20.716] [debug] checkForUpdatesAndNotify called, downloadPromise is null
+[2026-02-06 20:47:20.170] [info]  Checking for update
+[2026-02-06 20:47:20.171] [info]  Checking for update
+[2026-02-06 20:47:20.742] [info]  Update for version 0.53.1 is not available (latest version: 0.53.1, downgrade is allowed).
+[2026-02-06 20:47:20.742] [info]  Update not available: {
+   "version": "0.53.1",
+   "files": [
+      {
+         "url": "Anytype-0.53.1.AppImage",
+         "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+         "size": 238610679,
+         "blockMapSize": 248075
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype_0.53.1_amd64.deb",
+         "sha512": "bBL+kv8N700RP1Fc1ecdMXIQijqJyiYaxgFkW89XuLOMJAEhHN9Eu4tAkdCvrlswCN+0jLlHptASDGeSA5cSLg==",
+         "size": 177501590
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      },
+      {
+         "url": "anytype-0.53.1.x86_64.rpm",
+         "sha512": "fRbUlfuNdGkVEqpFP4mclOCr75fZyU8AHgYrrYDc/zG0nSAQHeclvQA/vnB86VYiCqHhYJf1KnHv0XpRs+JK9Q==",
+         "size": 176448345
+      }
+   ],
+   "path": "Anytype-0.53.1.AppImage",
+   "sha512": "KmB4wCBPrVUiGKiegk7V5gzUUCsMCIUDDtSM9qseZ54+5Nvgnl0o8r8caF/7IygtDG0a8GEXe4yx4fjBH5D2Ag==",
+   "releaseDate": "2025-12-22T14:31:15.214Z"
+}
+[2026-02-06 20:47:20.742] [debug] checkForUpdatesAndNotify called, downloadPromise is null

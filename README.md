@@ -1,5 +1,7 @@
 # Niri WM Dotfiles
 
+> This is a fork of `saatvik333/niri-dotfiles`. Thanks to the original author and contributors for the base setup.
+
 <div align="center">
 
 **A productive and clean [Niri](https://github.com/YaLTeR/niri) configuration setup**  
@@ -55,7 +57,11 @@ _Dynamic theming • Borderless layouts • Minimal_
 For Arch Linux and Arch-based distributions (Manjaro, EndeavourOS, etc.):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/saatvik333/niri-dotfiles/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/G3rze/niri-dotfiles/main/install.sh | sh
+```
+
+```bash
+wget -qO- https://raw.githubusercontent.com/G3rze/niri-dotfiles/main/install.sh | sh
 ```
 
 **Important Requirements:**
@@ -90,6 +96,20 @@ The automated installer will:
 
 Installation Time: Approximately 15-30 minutes depending on your internet speed.
 
+# Waydroid (Optional)
+
+If you use Waydroid for WhatsApp calls, two optional steps can improve the experience:
+
+1. Disable the on-screen keyboard so it doesn’t interfere with call UI.
+2. Complete Google Play certification so WhatsApp can use Play services properly.
+
+References:
+
+```
+https://docs.waydro.id/faq/disable-on-screen-keyboard?q=disab
+https://docs.waydro.id/faq/google-play-certification
+```
+
 # What Gets Installed
 
 Core Components
@@ -113,6 +133,8 @@ Additional Tools
     Prompt: Starship
     Authentication: Polkit-gnome
     Utilities: dust, eza, niri-switch
+    Optional: Waydroid (Android container), Syncthing (file sync), Anytype (anytype-bin, AUR)
+    Optional Dev Tools: nvm + Node.js LTS, OpenJDK, OpenAI Codex CLI (requires ChatGPT Plus or an OpenAI API key)
 
 Development Tools
 
@@ -149,6 +171,47 @@ Thanks to [vinceliuice](https://github.com/vinceliuice) and [Fausto-Korpsvart](h
 - Alacritty
 - Kitty
 - Starship
+
+## Developer Tools
+
+Optional developer tools can be installed by the installer:
+
+- nvm + Node.js LTS
+- OpenJDK
+- OpenAI Codex CLI (requires ChatGPT Plus or an OpenAI API key)
+
+### Neovim Config
+
+This setup is based on LazyVim with additional language extras enabled and a C++ template workflow.
+
+Highlights:
+
+- LazyVim core + extra language packs (TS/JS, Python, JSON/YAML, Markdown, Docker, Terraform, HTML/CSS/Tailwind, Rust, Go, Clangd, Prisma)
+- LSP + tooling via Mason (language servers, formatters, linters)
+- Formatting via `conform.nvim`
+- Linting via `nvim-lint`
+- Theme via `neopywal`
+
+#### Neovim Shortcuts (Custom)
+
+These are defined in the config files in this repo:
+
+- `<leader>ct` - Open C++ template picker
+- `<leader>ccp` - Insert C++ competitive programming template
+- `<leader>csm` - Insert C++ simple main template
+
+Notes:
+
+- When you create a new `*.cpp` file, you’ll be prompted to apply a template automatically.
+- There are also `:CppTemplate`, `:CppCompetitive`, and `:CppSimple` commands.
+
+#### Neovim Shortcuts (LazyVim Defaults)
+
+LazyVim provides a large set of default keymaps. For the full list, see:
+
+```
+https://www.lazyvim.org/keymaps
+```
 
 ## Keybinds
 

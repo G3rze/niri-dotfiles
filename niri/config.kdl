@@ -16,7 +16,7 @@ output "eDP-1" {
 input {
     keyboard {
         xkb {
-            layout "us"
+            layout "latam"
             options "caps:escape"
         }
     }
@@ -60,8 +60,8 @@ binds {
     MOD+ALT+RETURN                      hotkey-overlay-title="Open Terminal: kitty" { spawn-sh "kitty"; }
     MOD+ALT+B                         hotkey-overlay-title="Open Secondary Browser: chrome" { spawn-sh "google-chrome-stable --enable-features=TouchpadOverscrollHistoryNavigation"; }
     MOD+SHIFT+Q                         hotkey-overlay-title="Lock Screen: gtklock" { spawn-sh "gtklock"; }
-    MOD+A                               hotkey-overlay-title="Open App Launcher: vicinae" { spawn-sh "vicinae toggle"; }
-    MOD+B                               hotkey-overlay-title="Open Browser: firefox" { spawn-sh "firefox-developer-edition"; }
+    MOD+A                               hotkey-overlay-title="Open App Launcher: rofi" { spawn-sh "rofi -show drun"; }
+    CTRL+B                              hotkey-overlay-title="Open Browser: zen-browser" { spawn-sh "zen-browser"; }
     MOD+E                               hotkey-overlay-title="File Manager: Thunar" { spawn-sh "thunar"; }
     MOD+ALT+E                           hotkey-overlay-title="File Manager: Yazi" { spawn-sh "yazi"; }
     MOD+W                               hotkey-overlay-title="Open Wallpaper Selector" { spawn-sh "$HOME/.config/scripts/bgselector.sh"; }
@@ -214,12 +214,12 @@ layout {
 
     focus-ring {
         width 0
-        active-color "#1E1E2E"
+        active-color "#282828"
     }
 
     insert-hint {
         off
-        color "#1E1E2E"
+        color "#282828"
     }
 
     struts {}
@@ -267,6 +267,12 @@ window-rule {
     open-floating true
 }
 
+// Alacritty always translucent
+window-rule {
+    match app-id="^Alacritty$"
+    opacity 0.8
+}
+
 window-rule {
     match app-id=r#"firefox"#
     match app-id=r#"google-chrome"#
@@ -287,7 +293,7 @@ window-rule {
 window-rule {
     match title=r#".*File.*"#
     open-floating true
-    default-column-width { proportion 0.0; }
+					default-column-width { proportion 0.0; }
     max-width 800
     max-height 1000
 }
@@ -406,4 +412,3 @@ environment {
     VDPAU_DRIVER "va_gl"
     LIBVA_DRIVER_NAME "iHD"
 }
-
