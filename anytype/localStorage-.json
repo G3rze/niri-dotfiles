@@ -1,6 +1,5 @@
 {
 	"setSpellingLang": true,
-	"accountId": "A7iKy43ETvshEupZRT3TLgBXo7s3n7VvMpYXsUrrFda36ni8",
 	"account": {
 		"A7iKy43ETvshEupZRT3TLgBXo7s3n7VvMpYXsUrrFda36ni8": {
 			"spaceId": "bafyreia6w3xy4e7pfaibijeatgukk46cllcgef2qay6pgsinojcydapmyi.110xb31s3oqtl"
@@ -50,7 +49,8 @@
 					"isHidden": false
 				}
 			]
-		}
+		},
+		"": {}
 	},
 	"survey": {
 		"2": {
@@ -61,5 +61,9 @@
 	"highlights": {
 		"createSpace": true
 	},
-	"whatsNew": false
+	"whatsNew": false,
+	"accountId": "A7iKy43ETvshEupZRT3TLgBXo7s3n7VvMpYXsUrrFda36ni8",
+	"onboarding": [
+		"objectDescriptionButton"
+	]
 }

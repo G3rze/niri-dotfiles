@@ -10,6 +10,7 @@ return {{
                   "lazyvim.plugins.extras.lang.terraform", "lazyvim.plugins.extras.lang.html",
                   "lazyvim.plugins.extras.lang.css", "lazyvim.plugins.extras.lang.tailwind",
                   "lazyvim.plugins.extras.lang.rust", "lazyvim.plugins.extras.lang.go",
+                  "lazyvim.plugins.extras.lang.java",
                   "lazyvim.plugins.extras.lang.clangd", "lazyvim.plugins.extras.lang.prisma",
                   "lazyvim.plugins.extras.ui.edgy", "lazyvim.plugins.extras.editor.refactoring",
                   "lazyvim.plugins.extras.util.project"}
@@ -21,10 +22,17 @@ return {{
         vim.list_extend(opts.ensure_installed, { -- Core LSP Servers
         "lua-language-server", "pyright", "ruff-lsp", "typescript-language-server", "eslint-lsp", "html-lsp", "css-lsp",
         "tailwindcss-language-server", "json-lsp", "yaml-language-server", "taplo", "marksman", "rust-analyzer",
+        "jdtls",
         "gopls", "dockerfile-language-server", "terraform-ls", "prisma-language-server", "clangd", -- Formatters
         "stylua", "prettierd", "eslint_d", "shfmt", "rustfmt", "gofumpt", "goimports", "taplo", "black", "isort",
         "clang-format", -- Linters
         "shellcheck", "ruff", "eslint_d", "yamllint", "markdownlint", "hadolint"})
+    end
+}, {
+    "nvim-treesitter/nvim-treesitter",
+    opts = function(_, opts)
+        opts.ensure_installed = opts.ensure_installed or {}
+        vim.list_extend(opts.ensure_installed, {"java"})
     end
 }, {
     "mfussenegger/nvim-lint",

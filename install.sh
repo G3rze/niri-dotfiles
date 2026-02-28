@@ -65,7 +65,7 @@ readonly PACMAN_PACKAGES=(
   zathura zathura-pdf-mupdf ttf-jetbrains-mono-nerd
   noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
   qt5-wayland qt6-wayland polkit-gnome ffmpeg imagemagick unzip jq
-  gtklock rofi curl libnotify
+  gtklock rofi curl libnotify brightnessctl
 )
 
 # ==========================

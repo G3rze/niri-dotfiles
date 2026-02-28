@@ -2486,3 +2486,26 @@
 2026-02-06T23:00:16 player: played "Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/01 オドループ.flac"
 2026-02-06T23:11:35 player: played "Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/01 オドループ.flac"
 2026-02-06T23:17:16 player: played "Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/01 オドループ.flac"
+2026-02-07T08:37:24 player: played "Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/01 オドループ.flac"
+2026-02-07T18:55:49 exception: Failed to open /home/gerze/.config/mpd/playlists: No such file or directory
+2026-02-07T18:55:50 exception: Failed to open /home/gerze/.config/mpd/playlists: No such file or directory
+2026-02-07T18:56:41 player: played "Frederic/Frederic - Oddloop - 2014-09-24 (CD - FLAC - Lossless)/01 オドループ.flac"
+2026-02-07T18:58:48 player: played "One Coin/One Coin - APPLE PAY/One Coin - APPLE PAY.flac"
+2026-02-08T10:04:41 output: Failed to play on "MPD Pipewire Output" (pipewire): no target node available
+2026-02-08T10:04:41 exception: Failed to open audio output
+2026-02-08T21:17:48 player: played "One Coin/One Coin - APPLE PAY/One Coin - APPLE PAY.flac"
+2026-02-08T22:50:54 player: played "One Coin/One Coin - APPLE PAY/One Coin - APPLE PAY.flac"
+2026-02-09T20:33:56 exception: Failed to open /home/gerze/.config/mpd/playlists: No such file or directory
+2026-02-09T20:33:57 exception: Failed to open /home/gerze/.config/mpd/playlists: No such file or directory
+2026-02-09T20:34:35 player: played "One Coin/One Coin - APPLE PAY/One Coin - APPLE PAY.flac"
+2026-02-09T20:34:40 player: played "One Coin/One Coin - APPLE PAY/One Coin - APPLE PAY.flac"
+2026-02-09T20:38:06 player: played "Milo j/Milo j - 111/01. Milo j - TU MANTA.flac"
+2026-02-09T20:39:34 player: played "Milo j/Milo j - 111/04. Milo j - DESEO PERDER (INTERLUDIO).flac"
+2026-02-09T20:42:37 player: played "Milo j/Milo j - 111/08. Milo j - UNA BALA.flac"
+2026-02-09T20:46:40 player: played "Milo j/Milo j - 111/05. Milo j - SINCERA TE.flac"
+2026-02-09T20:49:49 player: played "Milo j/Milo j - 111/07. Milo j - DOM1NGO.flac"
+2026-02-09T20:52:30 player: played "Milo j/Milo j - 111/10. Milo j - A1RE.flac"
+2026-02-09T20:56:46 player: played "Milo j/Milo j - 111/09. Milo j - ALUMBRE.flac"
+2026-02-09T20:59:51 player: played "Milo j/Milo j - 111/03. Milo j - M.A.I.flac"
+2026-02-09T21:02:24 player: played "Milo j/Milo j - 111/06. Milo j - TE FUI A SEGUIR.flac"
+2026-02-09T21:05:23 player: played "Milo j/Milo j - 111/02. Milo j - CARENCIAS DE CORDURA.flac"
