@@ -13,6 +13,19 @@ readonly CONFIG_DIR="${HOME}/.config"
 readonly BACKUP_DIR="${HOME}/.config_backup_$(date +%Y%m%d_%H%M%S)"
 readonly LOG_DIR="${HOME}/.cache"
 readonly LOG_FILE="${LOG_DIR}/sevens-dots-install-$(date +%Y%m%d_%H%M%S).log"
+readonly INSTALL_STATE_DIR="${HOME}/.local/state/sevens-dots"
+readonly INSTALL_PROFILE_FILE="${INSTALL_STATE_DIR}/install-profile.sh"
+readonly USER_ENV_DIR="${HOME}/.config/environment.d"
+readonly SDL_ENV_FILE="${USER_ENV_DIR}/90-sdl-videodriver.conf"
+readonly SDL_VIDEODRIVER_VALUE="wayland,x11"
+readonly NOCTALIA_PATHS=(
+  "${HOME}/.config/noctalia"
+  "${HOME}/.config/quickshell"
+  "${HOME}/.cache/noctalia"
+  "${HOME}/.cache/quickshell"
+  "${HOME}/.local/state/noctalia"
+  "${HOME}/.local/state/quickshell"
+)
 
 # Temporary directory for builds (will be cleaned up)
 TEMP_BUILD_DIR=""
@@ -22,14 +35,42 @@ AUR_HELPER=""
 
 # Progress tracking
 CURRENT_STEP=0
-readonly TOTAL_STEPS=20
+readonly TOTAL_STEPS=28
 
 # Installation summary tracking
 declare -a INSTALL_SUMMARY=()
+declare -a NOCTALIA_PACKAGES=(
+  cachyos-niri-noctalia
+  noctalia-qs
+  noctalia-shell
+)
 
 # Shell configuration choices (will be set interactively)
 CONFIGURE_FISH=false
 CONFIGURE_ZSH=false
+SELECTED_XKB_LAYOUT="latam"
+SELECTED_XKB_OPTIONS="caps:escape"
+SELECTED_LANG="${LANG:-en_US.UTF-8}"
+REPAIR_MODE=false
+INSTALL_PROFILE_LOADED=false
+INSTALL_XWAYLAND=false
+INSTALL_XWAYLAND_BRIDGE=false
+INSTALL_STEAM=false
+INSTALL_DISCORD=false
+INSTALL_RETROARCH=false
+INSTALL_SPOTIFY=false
+INSTALL_LIBREOFFICE=false
+INSTALL_ONLYOFFICE=false
+INSTALL_SYNCTHING=false
+INSTALL_DOCKER=false
+INSTALL_CODE=false
+INSTALL_NVM=false
+INSTALL_NODE_LTS=false
+INSTALL_CODEX_CLI=false
+SELECTED_JAVA_PACKAGE=""
+
+declare -a SELECTED_OPTIONAL_PACMAN_PACKAGES=()
+declare -a SELECTED_OPTIONAL_AUR_PACKAGES=()
 
 # Process ID for sudo keep-alive
 SUDO_PID=""
@@ -37,12 +78,15 @@ SUDO_PID=""
 # Expected configuration folders in the repo
 readonly CONFIG_FOLDERS=(
   niri waybar fish zsh fastfetch mako alacritty kitty starship
-  nvim yazi gtklock zathura wallust rofi scripts mpd rmpc waydroid anytype
+  nvim yazi gtklock zathura wallust rofi scripts mpd rmpc anytype
 )
 
 # Optional dependencies that waybar modules depend on
 readonly OPTIONAL_AUDIO_PACKAGES=("pulseaudio" "pipewire-pulse")
 readonly OPTIONAL_BLUETOOTH_PACKAGES=("bluez" "bluez-utils")
+readonly OPTIONAL_XWAYLAND_PACKAGES=("xorg-xwayland" "xwayland-satellite")
+readonly OPTIONAL_DESKTOP_PACKAGES=("steam" "discord" "retroarch" "spotify-launcher" "libreoffice-fresh" "onlyoffice-bin")
+readonly OPTIONAL_DEVTOOLS_PACKAGES=("docker" "code")
 
 # AUR packages to install
 readonly AUR_PACKAGES=(
@@ -56,7 +100,6 @@ readonly AUR_PACKAGES=(
   pavucontrol
   thunar
   minizip
-  awww-git
 )
 
 # Official repository packages
@@ -65,7 +108,8 @@ readonly PACMAN_PACKAGES=(
   zathura zathura-pdf-mupdf ttf-jetbrains-mono-nerd
   noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
   qt5-wayland qt6-wayland polkit-gnome ffmpeg imagemagick unzip jq
-  gtklock rofi curl libnotify brightnessctl
+  gtklock rofi curl libnotify brightnessctl firefox hyprpicker playerctl awww mpd rmpc
+  blueman network-manager-applet bottom thunar pavucontrol
 )
 
 # ==========================
@@ -135,6 +179,51 @@ add_summary() {
   INSTALL_SUMMARY+=("$1")
 }
 
+load_install_modules() {
+  local modules_dir="${DOTDIR}/scripts/install"
+  local bootstrap_dir="${HOME}/.cache/sevens-dots-install-modules"
+  local module
+  local modules=(
+    package-selection.sh
+    config-targets.sh
+    post-install.sh
+    install-profile.sh
+  )
+
+  if [[ -f "${modules_dir}/package-selection.sh" ]] &&
+    [[ -f "${modules_dir}/config-targets.sh" ]] &&
+    [[ -f "${modules_dir}/post-install.sh" ]] &&
+    [[ -f "${modules_dir}/install-profile.sh" ]]; then
+    source "${modules_dir}/package-selection.sh"
+    source "${modules_dir}/config-targets.sh"
+    source "${modules_dir}/post-install.sh"
+    source "${modules_dir}/install-profile.sh"
+    return 0
+  fi
+
+  mkdir -p "${bootstrap_dir}"
+
+  info "Installer modules not found next to install.sh, fetching them temporarily..."
+
+  for module in "${modules[@]}"; do
+    local target_file="${bootstrap_dir}/${module}"
+    local raw_url="https://raw.githubusercontent.com/G3rze/niri-dotfiles/main/scripts/install/${module}"
+
+    if command -v curl &> /dev/null; then
+      curl -fsSL "${raw_url}" -o "${target_file}" >> "${LOG_FILE}" 2>&1 || fatal "Failed to fetch installer module: ${module}"
+    elif command -v wget &> /dev/null; then
+      wget -qO "${target_file}" "${raw_url}" >> "${LOG_FILE}" 2>&1 || fatal "Failed to fetch installer module: ${module}"
+    else
+      fatal "This standalone install.sh requires curl or wget to fetch installer modules. Run it from the cloned repo or install curl first."
+    fi
+  done
+
+  source "${bootstrap_dir}/package-selection.sh"
+  source "${bootstrap_dir}/config-targets.sh"
+  source "${bootstrap_dir}/post-install.sh"
+  source "${bootstrap_dir}/install-profile.sh"
+}
+
 # ==========================
 # USAGE & HELP
 # ==========================
@@ -148,6 +237,7 @@ Sevens-Dots Installer - Automated setup for Niri window manager configuration
 OPTIONS:
   -h, --help      Display this help message and exit
   -v, --version   Display version information
+  -r, --repair    Reapply saved installer choices to repair managed config
 
 DESCRIPTION:
   This script automates the installation and configuration of a complete
@@ -176,6 +266,7 @@ LOG FILE:
 EXAMPLES:
   ${0##*/}              # Run interactive installation
   ${0##*/} --help       # Display this help message
+  ${0##*/} --repair     # Reapply saved optional choices and managed configs
 
 REPORT BUGS:
   https://github.com/G3rze/niri-dotfiles/issues
@@ -434,6 +525,30 @@ verify_binary() {
   return 0
 }
 
+detect_current_niri_layout() {
+  local detected=""
+
+  if [[ -f "${HOME}/.config/niri/config.kdl" ]]; then
+    detected="$(grep -Rsm1 'layout "' "${HOME}/.config/niri" 2> /dev/null | sed -E 's/.*layout "([^"]+)".*/\1/' || true)"
+  fi
+
+  if [[ -n "${detected}" ]]; then
+    printf '%s\n' "${detected}"
+  else
+    printf 'latam\n'
+  fi
+}
+
+detect_current_niri_options() {
+  local detected=""
+
+  if [[ -f "${HOME}/.config/niri/config.kdl" ]]; then
+    detected="$(grep -Rsm1 'options "' "${HOME}/.config/niri" 2> /dev/null | sed -E 's/.*options "([^"]*)".*/\1/' || true)"
+  fi
+
+  printf '%s\n' "${detected}"
+}
+
 # ==========================
 # BACKUP FUNCTIONS
 # ==========================
@@ -475,6 +590,81 @@ create_backup() {
     msg "Backed up ${backed_up} configuration(s) to: ${BACKUP_DIR}"
   else
     info "No existing configurations found to backup."
+  fi
+}
+
+backup_and_remove_path() {
+  local source_path="$1"
+  local backup_root="$2"
+
+  if [[ ! -e "${source_path}" ]] && [[ ! -L "${source_path}" ]]; then
+    return 1
+  fi
+
+  local relative_path="${source_path#"${HOME}/"}"
+  local backup_path="${backup_root}/${relative_path}"
+  local backup_parent
+  backup_parent="$(dirname "${backup_path}")"
+  mkdir -p "${backup_parent}"
+
+  if [[ -L "${source_path}" ]]; then
+    local link_target
+    link_target="$(readlink "${source_path}")"
+    printf '%s\n' "${link_target}" > "${backup_path}.symlink"
+    rm -f "${source_path}"
+    info "Removed symlinked path: ${source_path}"
+    return 0
+  fi
+
+  if mv "${source_path}" "${backup_path}"; then
+    info "Backed up and removed: ${source_path}"
+    return 0
+  fi
+
+  warn "Failed to back up special path: ${source_path}"
+  return 1
+}
+
+remove_noctalia_state() {
+  info "Removing Noctalia and QuickShell state so the new config fully takes over..."
+
+  local removed=0
+  for path in "${NOCTALIA_PATHS[@]}"; do
+    if backup_and_remove_path "${path}" "${BACKUP_DIR}"; then
+      ((++removed)) || true
+    fi
+  done
+
+  if [[ ${removed} -gt 0 ]]; then
+    add_summary "Removed Noctalia/QuickShell state (${removed} path(s))"
+  else
+    info "No Noctalia or QuickShell state found."
+  fi
+}
+
+purge_noctalia_packages() {
+  info "Purging Noctalia packages so they cannot reapply the old setup..."
+
+  local installed_packages=()
+  local pkg
+  for pkg in "${NOCTALIA_PACKAGES[@]}"; do
+    if pacman -Q "${pkg}" >> "${LOG_FILE}" 2>&1; then
+      installed_packages+=("${pkg}")
+    fi
+  done
+
+  if [[ ${#installed_packages[@]} -eq 0 ]]; then
+    info "No installed Noctalia packages found."
+    return 0
+  fi
+
+  pkill -f "noctalia|quickshell|qs -c noctalia-shell" >> "${LOG_FILE}" 2>&1 || true
+
+  if sudo pacman -Rns --noconfirm "${installed_packages[@]}" >> "${LOG_FILE}" 2>&1; then
+    msg "Purged Noctalia packages: ${installed_packages[*]}"
+    add_summary "Purged Noctalia packages: ${installed_packages[*]}"
+  else
+    fatal "Failed to purge Noctalia packages."
   fi
 }
 
@@ -599,17 +789,6 @@ check_yay_linkage() {
   fi
 }
 
-install_pacman_packages() {
-  info "Installing official repository packages..."
-  info "This may take several minutes..."
-
-  if sudo pacman -S --needed --noconfirm "${PACMAN_PACKAGES[@]}" 2>&1 | tee -a "${LOG_FILE}"; then
-    msg "Official packages installed successfully."
-  else
-    fatal "Failed to install official repository packages."
-  fi
-}
-
 cargo_fix() {
   info "Checking Rust toolchain configuration..."
 
@@ -634,17 +813,6 @@ cargo_fix() {
   fi
 
   return 0
-}
-
-install_aur_packages() {
-  info "Installing AUR packages using ${AUR_HELPER}..."
-  info "This may take several minutes..."
-
-  if "${AUR_HELPER}" -S --needed --noconfirm "${AUR_PACKAGES[@]}" 2>&1 | tee -a "${LOG_FILE}"; then
-    msg "AUR packages installed successfully."
-  else
-    fatal "Failed to install AUR packages."
-  fi
 }
 
 install_colloid_theme() {
@@ -906,8 +1074,57 @@ verify_all_binaries() {
   local missing_binaries=()
   local binaries_to_check=(
     niri waybar fish fastfetch mako alacritty kitty starship
-    nvim yazi gtklock zathura wallust awww rofi mpd rmpc waydroid
+    nvim yazi gtklock zathura wallust awww rofi firefox hyprpicker
+    playerctl thunar pavucontrol btm rmpc
   )
+
+  if [[ "${INSTALL_XWAYLAND}" == "true" ]]; then
+    binaries_to_check+=("Xwayland")
+  fi
+
+  if [[ "${INSTALL_XWAYLAND_BRIDGE}" == "true" ]]; then
+    binaries_to_check+=("xwayland-satellite")
+  fi
+
+  if [[ "${INSTALL_STEAM}" == "true" ]]; then
+    binaries_to_check+=("steam")
+  fi
+
+  if [[ "${INSTALL_DISCORD}" == "true" ]]; then
+    binaries_to_check+=("discord")
+  fi
+
+  if [[ "${INSTALL_RETROARCH}" == "true" ]]; then
+    binaries_to_check+=("retroarch")
+  fi
+
+  if [[ "${INSTALL_SPOTIFY}" == "true" ]]; then
+    binaries_to_check+=("spotify-launcher")
+  fi
+
+  if [[ "${INSTALL_LIBREOFFICE}" == "true" ]]; then
+    binaries_to_check+=("libreoffice")
+  fi
+
+  if [[ "${INSTALL_ONLYOFFICE}" == "true" ]]; then
+    binaries_to_check+=("onlyoffice-desktopeditors")
+  fi
+
+  if [[ "${INSTALL_SYNCTHING}" == "true" ]]; then
+    binaries_to_check+=("syncthing")
+  fi
+
+  if [[ "${INSTALL_DOCKER}" == "true" ]]; then
+    binaries_to_check+=("docker")
+  fi
+
+  if [[ "${INSTALL_CODE}" == "true" ]]; then
+    binaries_to_check+=("code")
+  fi
+
+  if [[ -n "${SELECTED_JAVA_PACKAGE}" ]]; then
+    binaries_to_check+=("javac")
+  fi
 
   for binary in "${binaries_to_check[@]}"; do
     if ! verify_binary "${binary}"; then
@@ -929,6 +1146,9 @@ verify_all_binaries() {
 # ==========================
 
 configure_shells() {
+  if [[ "${REPAIR_MODE}" == "true" ]] && [[ "${INSTALL_PROFILE_LOADED}" == "true" ]]; then
+    info "Repair mode: reusing saved shell configuration choices."
+  else
   info "Shell configuration setup..."
   printf "\n"
   printf "${BLUE}${BOLD}Which shell configuration(s) would you like to set up?${NC}\n"
@@ -969,6 +1189,7 @@ configure_shells() {
       msg "Selected: Both Fish and Zsh configurations"
       ;;
   esac
+  fi
 
   local shells_to_install=()
 
@@ -1022,6 +1243,11 @@ EOF
 }
 
 set_default_shell() {
+  if [[ "${REPAIR_MODE}" == "true" ]] && [[ "${INSTALL_PROFILE_LOADED}" == "true" ]]; then
+    info "Repair mode: skipping default shell prompt."
+    return 0
+  fi
+
   if [[ "${CONFIGURE_FISH}" == "false" ]] && [[ "${CONFIGURE_ZSH}" == "false" ]]; then
     info "No shell configurations were set up. Skipping default shell selection."
     return 0
@@ -1119,6 +1345,172 @@ set_default_shell() {
   fi
 }
 
+configure_keyboard_and_language() {
+  if [[ "${REPAIR_MODE}" == "true" ]] && [[ "${INSTALL_PROFILE_LOADED}" == "true" ]]; then
+    info "Repair mode: reusing saved keyboard and language settings."
+    add_summary "Keyboard/layout reused from saved install profile"
+    return 0
+  fi
+
+  info "Keyboard and language setup..."
+
+  local current_layout current_options current_lang
+  current_layout="$(detect_current_niri_layout)"
+  current_options="$(detect_current_niri_options)"
+  current_lang="${LANG:-en_US.UTF-8}"
+
+  while true; do
+    printf "\n"
+    printf "${BLUE}${BOLD}Keyboard Layout Selection${NC}\n"
+    printf "  1) Keep current layout (%s)\n" "${current_layout}"
+    printf "  2) us\n"
+    printf "  3) latam\n"
+    printf "  4) es\n"
+    printf "  5) br\n"
+    printf "  6) fr\n"
+    printf "  7) de\n"
+    printf "  8) it\n"
+    printf "  9) jp\n"
+    printf "  10) Custom\n"
+    printf "\n"
+
+    local reply custom_value
+    read -r -p "Choose keyboard layout (1-10) [default: 1]: " reply < /dev/tty
+
+    case "${reply}" in
+      2) SELECTED_XKB_LAYOUT="us" ;;
+      3) SELECTED_XKB_LAYOUT="latam" ;;
+      4) SELECTED_XKB_LAYOUT="es" ;;
+      5) SELECTED_XKB_LAYOUT="br" ;;
+      6) SELECTED_XKB_LAYOUT="fr" ;;
+      7) SELECTED_XKB_LAYOUT="de" ;;
+      8) SELECTED_XKB_LAYOUT="it" ;;
+      9) SELECTED_XKB_LAYOUT="jp" ;;
+      10)
+        read -r -p "Enter custom XKB layout (example: us, latam, es, br, fr): " custom_value < /dev/tty
+        SELECTED_XKB_LAYOUT="${custom_value:-${current_layout}}"
+        ;;
+      *) SELECTED_XKB_LAYOUT="${current_layout}" ;;
+    esac
+
+    printf "\n"
+    printf "${BLUE}${BOLD}Keyboard Options Selection${NC}\n"
+    printf "  1) Keep current options (%s)\n" "${current_options:-none}"
+    printf "  2) caps:escape\n"
+    printf "  3) compose:ralt\n"
+    printf "  4) None\n"
+    printf "  5) Custom\n"
+    printf "\n"
+
+    read -r -p "Choose keyboard options (1-5) [default: 1]: " reply < /dev/tty
+
+    case "${reply}" in
+      2) SELECTED_XKB_OPTIONS="caps:escape" ;;
+      3) SELECTED_XKB_OPTIONS="compose:ralt" ;;
+      4) SELECTED_XKB_OPTIONS="" ;;
+      5)
+        read -r -p "Enter custom XKB options (leave empty for none): " custom_value < /dev/tty
+        SELECTED_XKB_OPTIONS="${custom_value}"
+        ;;
+      *) SELECTED_XKB_OPTIONS="${current_options}" ;;
+    esac
+
+    printf "\n"
+    printf "${BLUE}${BOLD}Language Selection${NC}\n"
+    printf "  1) Keep current language (%s)\n" "${current_lang}"
+    printf "  2) en_US.UTF-8\n"
+    printf "  3) es_SV.UTF-8\n"
+    printf "  4) es_MX.UTF-8\n"
+    printf "  5) es_ES.UTF-8\n"
+    printf "  6) pt_BR.UTF-8\n"
+    printf "  7) fr_FR.UTF-8\n"
+    printf "  8) de_DE.UTF-8\n"
+    printf "  9) it_IT.UTF-8\n"
+    printf "  10) ja_JP.UTF-8\n"
+    printf "  11) Custom\n"
+    printf "\n"
+
+    read -r -p "Choose language (1-11) [default: 1]: " reply < /dev/tty
+
+    case "${reply}" in
+      2) SELECTED_LANG="en_US.UTF-8" ;;
+      3) SELECTED_LANG="es_SV.UTF-8" ;;
+      4) SELECTED_LANG="es_MX.UTF-8" ;;
+      5) SELECTED_LANG="es_ES.UTF-8" ;;
+      6) SELECTED_LANG="pt_BR.UTF-8" ;;
+      7) SELECTED_LANG="fr_FR.UTF-8" ;;
+      8) SELECTED_LANG="de_DE.UTF-8" ;;
+      9) SELECTED_LANG="it_IT.UTF-8" ;;
+      10) SELECTED_LANG="ja_JP.UTF-8" ;;
+      11)
+        read -r -p "Enter custom locale (example: en_US.UTF-8): " custom_value < /dev/tty
+        SELECTED_LANG="${custom_value:-${current_lang}}"
+        ;;
+      *) SELECTED_LANG="${current_lang}" ;;
+    esac
+
+    printf "\n"
+    printf "${CYAN}Selected keyboard layout:${NC} %s\n" "${SELECTED_XKB_LAYOUT}"
+    printf "${CYAN}Selected keyboard options:${NC} %s\n" "${SELECTED_XKB_OPTIONS:-none}"
+    printf "${CYAN}Selected language:${NC} %s\n" "${SELECTED_LANG}"
+    printf "\n"
+    printf "${YELLOW}Keyboard test area:${NC} type a short sample below and press Enter.\n"
+    printf "Suggested sample: []{} @ / \\\\ ~"
+    if [[ "${SELECTED_XKB_LAYOUT}" == "latam" ]] || [[ "${SELECTED_XKB_LAYOUT}" == "es" ]]; then
+      printf " ñ"
+    fi
+    printf "\n"
+
+    local test_input confirm
+    read -r -p "Test input: " test_input < /dev/tty
+    printf "You typed: %s\n" "${test_input}"
+    read -r -p "Apply these keyboard/language settings? (Y/n): " confirm < /dev/tty
+    printf "\n"
+
+    if [[ ! "${confirm}" =~ ^[Nn]$ ]]; then
+      add_summary "Keyboard/layout configured: ${SELECTED_XKB_LAYOUT} (${SELECTED_XKB_OPTIONS:-none}), LANG=${SELECTED_LANG}"
+      return 0
+    fi
+  done
+}
+
+apply_keyboard_and_language_config() {
+  local config_file="${CONFIG_DIR}/niri/config.kdl"
+
+  if [[ ! -f "${config_file}" ]]; then
+    warn "Niri config not found at ${config_file}, skipping keyboard/language configuration."
+    return 1
+  fi
+
+  info "Applying keyboard and language settings to Niri config..."
+
+  sed -i -E "s/(layout )\"[^\"]+\"/\\1\"${SELECTED_XKB_LAYOUT//\//\\/}\"/" "${config_file}"
+
+  if grep -q 'options "' "${config_file}"; then
+    if [[ -n "${SELECTED_XKB_OPTIONS}" ]]; then
+      sed -i -E "s/(options )\"[^\"]*\"/\\1\"${SELECTED_XKB_OPTIONS//\//\\/}\"/" "${config_file}"
+    else
+      sed -i '/^[[:space:]]*options ".*"/d' "${config_file}"
+    fi
+  elif [[ -n "${SELECTED_XKB_OPTIONS}" ]]; then
+    sed -i "/^[[:space:]]*layout \"/a\\            options \"${SELECTED_XKB_OPTIONS//\//\\/}\"" "${config_file}"
+  fi
+
+  if grep -q '^[[:space:]]*LANG "' "${config_file}"; then
+    sed -i -E "s/^[[:space:]]*LANG \".*\"/    LANG \"${SELECTED_LANG//\//\\/}\"/" "${config_file}"
+  else
+    sed -i "/^[[:space:]]*XDG_CURRENT_DESKTOP \"niri\"/a\\    LANG \"${SELECTED_LANG//\//\\/}\"" "${config_file}"
+  fi
+
+  if command -v niri &> /dev/null; then
+    if niri validate -c "${config_file}" >> "${LOG_FILE}" 2>&1; then
+      msg "Applied keyboard and language settings successfully."
+    else
+      fatal "Updated Niri config failed validation after keyboard/language changes."
+    fi
+  fi
+}
+
 # ==========================
 # DOTFILES MANAGEMENT
 # ==========================
@@ -1186,40 +1578,6 @@ validate_repo_structure() {
   fi
 }
 
-create_symlinks() {
-  msg "Creating symbolic links to ~/.config..."
-  local linked=0
-  local skipped=0
-
-  for folder in "${CONFIG_FOLDERS[@]}"; do
-    if [[ -d "${DOTDIR}/${folder}" ]]; then
-      local target="${CONFIG_DIR}/${folder}"
-
-      # Safety check for path validation
-      if [[ -z "${CONFIG_DIR}" ]] || [[ -z "${target}" ]]; then
-        fatal "Path validation failed: CONFIG_DIR or target is empty"
-      fi
-
-      if [[ -e "${target}" ]] || [[ -L "${target}" ]]; then
-        warn "Target still exists: ${folder} (removing)"
-        rm -rf "${target}"
-      fi
-
-      if ln -s "${DOTDIR}/${folder}" "${target}" 2>> "${LOG_FILE}"; then
-        info "Linked: ${folder}"
-        ((++linked)) || true
-      else
-        error "Failed to link: ${folder} (check log for details)"
-      fi
-    else
-      info "Skipping: ${folder} (not found in repository)"
-      ((++skipped)) || true
-    fi
-  done
-
-  msg "Created ${linked} symlink(s), skipped ${skipped}."
-}
-
 install_wallpapers() {
   if [[ -d "${DOTDIR}/wallpapers" ]]; then
     info "Installing wallpapers..."
@@ -1269,17 +1627,22 @@ create_systemd_services() {
   info "To enable autostart on login: systemctl --user enable gtklock"
   printf "\n"
 
-  info "Enabling user mpd service..."
-  if systemctl --user enable --now mpd >> "${LOG_FILE}" 2>&1; then
-    add_summary "mpd user service enabled"
+  if verify_binary mpd; then
+    info "Enabling user mpd service..."
+    mkdir -p "${HOME}/.config/mpd/playlists"
+    if systemctl --user enable --now mpd >> "${LOG_FILE}" 2>&1; then
+      add_summary "mpd user service enabled"
+    else
+      warn "Failed to enable/start mpd user service."
+    fi
   else
-    warn "Failed to enable/start mpd user service."
+    info "mpd is not installed. Skipping user service enable."
   fi
 
   local reply
-  read -r -p "Enable Waydroid (container service)? (y/N): " reply < /dev/tty
-  if [[ "${reply}" =~ ^[Yy]$ ]]; then
-    if verify_binary waydroid; then
+  if verify_binary waydroid; then
+    read -r -p "Enable Waydroid (container service)? (y/N): " reply < /dev/tty
+    if [[ "${reply}" =~ ^[Yy]$ ]]; then
       if [[ ! -f "/var/lib/waydroid/waydroid.cfg" ]]; then
         info "Waydroid is not initialized."
         read -r -p "Initialize Waydroid with Google Apps (waydroid init -s GAPPS)? (y/N): " reply < /dev/tty
@@ -1293,96 +1656,38 @@ create_systemd_services() {
           warn "Skipping Waydroid init. You can run: sudo waydroid init -s GAPPS"
         fi
       fi
-    else
-      warn "Waydroid not installed, skipping init."
-    fi
 
-    info "Enabling waydroid system service..."
-    if sudo systemctl enable --now waydroid-container >> "${LOG_FILE}" 2>&1; then
-      add_summary "waydroid-container service enabled"
+      info "Enabling waydroid system service..."
+      if sudo systemctl enable --now waydroid-container >> "${LOG_FILE}" 2>&1; then
+        add_summary "waydroid-container service enabled"
+      else
+        warn "Failed to enable/start waydroid-container. You may need to start it manually."
+      fi
     else
-      warn "Failed to enable/start waydroid-container. You may need to install Waydroid or start it manually."
+      info "Skipping Waydroid service enable."
     fi
   else
-    info "Skipping Waydroid service enable."
+    info "Waydroid is not installed. Skipping Waydroid setup."
   fi
 
-  read -r -p "Install and enable Syncthing (user service)? (y/N): " reply < /dev/tty
-  if [[ "${reply}" =~ ^[Yy]$ ]]; then
-    if ! verify_binary syncthing; then
-      info "Installing syncthing..."
-      if sudo pacman -S --needed --noconfirm syncthing >> "${LOG_FILE}" 2>&1; then
-        add_summary "syncthing installed"
+  if [[ "${INSTALL_SYNCTHING}" == "true" ]]; then
+    if verify_binary syncthing; then
+      info "Enabling syncthing user service..."
+      if systemctl --user enable --now syncthing >> "${LOG_FILE}" 2>&1; then
+        add_summary "syncthing user service enabled"
       else
-        warn "Failed to install syncthing."
+        warn "Failed to enable/start syncthing user service."
       fi
-    fi
-    info "Enabling syncthing user service..."
-    if systemctl --user enable --now syncthing >> "${LOG_FILE}" 2>&1; then
-      add_summary "syncthing user service enabled"
     else
-      warn "Failed to enable/start syncthing user service."
+      warn "syncthing was selected but the binary is not available."
     fi
   else
     info "Skipping Syncthing."
   fi
 
+  configure_docker_access
+
   msg "Systemd services configured."
-}
-
-install_dev_tools() {
-  local reply
-  read -r -p "Install optional developer tools (nvm, Node LTS, OpenJDK)? (y/N): " reply < /dev/tty
-  if [[ ! "${reply}" =~ ^[Yy]$ ]]; then
-    info "Skipping developer tools."
-    return
-  fi
-
-  info "Installing nvm..."
-  if curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash >> "${LOG_FILE}" 2>&1; then
-    add_summary "nvm installed"
-  else
-    warn "nvm install failed."
-  fi
-
-  export NVM_DIR="${HOME}/.nvm"
-  if [[ -s "${NVM_DIR}/nvm.sh" ]]; then
-    # shellcheck disable=SC1090
-    . "${NVM_DIR}/nvm.sh"
-    info "Installing latest Node.js LTS via nvm..."
-    if nvm install --lts >> "${LOG_FILE}" 2>&1; then
-      add_summary "Node.js LTS installed (nvm)"
-    else
-      warn "Node.js LTS install failed."
-    fi
-  else
-    warn "nvm not found after install; skipping Node.js LTS."
-  fi
-
-  info "Installing OpenJDK..."
-  if sudo pacman -S --needed --noconfirm jdk-openjdk >> "${LOG_FILE}" 2>&1; then
-    add_summary "OpenJDK installed"
-  else
-    warn "OpenJDK install failed."
-  fi
-
-  printf "\n"
-  info "OpenAI Codex CLI install is optional."
-  info "Requires ChatGPT Plus or a valid OpenAI API key."
-  read -r -p "Install OpenAI Codex CLI (npm i -g @openai/codex)? (y/N): " reply < /dev/tty
-  if [[ "${reply}" =~ ^[Yy]$ ]]; then
-    if command -v npm >/dev/null 2>&1; then
-      if npm i -g @openai/codex >> "${LOG_FILE}" 2>&1; then
-        add_summary "OpenAI Codex CLI installed"
-      else
-        warn "Codex CLI install failed."
-      fi
-    else
-      warn "npm not found; cannot install Codex CLI."
-    fi
-  else
-    info "Skipping Codex CLI."
-  fi
 }
 
 create_gtklock_service() {
@@ -1454,13 +1759,14 @@ EOF
   separator
   printf "${MAGENTA}${BOLD}Next Steps:${NC}\n"
   printf "  1. Log out of your current session\n"
-  printf "  2. Switch to a TTY (for example: Ctrl+Alt+F2)\n"
-  printf "  3. Log in and start Niri with: dbus-run-session niri\n"
+  printf "  2. Switch to tty1 (for example: Ctrl+Alt+F1 or Ctrl+Alt+F2, depending on your system)\n"
+  printf "  3. Log in on tty1 to auto-start Niri, or run manually with: dbus-run-session niri\n"
   printf "\n"
   printf "${BLUE}${BOLD}Important Notes:${NC}\n"
   printf "  • Services are auto-started by niri.conf, not systemd\n"
   printf "  • awww-daemon, waybar, and polkit start automatically\n"
-  printf "  • mpd is enabled as a user service\n"
+  printf "  • Niri auto-starts from the installed fish/zsh config only on tty1\n"
+  printf "  • mpd is enabled as a user service if installed successfully\n"
   printf "  • waydroid-container can be enabled during install (optional)\n"
   printf "  • syncthing can be installed/enabled during install (optional)\n"
   printf "  • gtklock can be triggered manually or via idle timeout\n"
@@ -1493,8 +1799,18 @@ EOF
 
 main() {
   mkdir -p "${LOG_DIR}"
+  load_install_modules
+  load_install_profile || true
 
   print_header
+
+  if [[ "${REPAIR_MODE}" == "true" ]]; then
+    if [[ "${INSTALL_PROFILE_LOADED}" == "true" ]]; then
+      info "Running in repair mode using saved install profile: ${INSTALL_PROFILE_FILE}"
+    else
+      warn "Repair mode requested but no saved install profile was found. Falling back to interactive selections."
+    fi
+  fi
 
   step "Pre-flight System Checks"
   check_not_root
@@ -1517,6 +1833,9 @@ main() {
   install_base_tools
   add_summary "Base development tools installed (git, base-devel, curl)"
 
+  step "Purging Noctalia Packages"
+  purge_noctalia_packages
+
   step "AUR Helper Selection and Installation"
   choose_aur_helper
   add_summary "AUR helper configured: ${AUR_HELPER}"
@@ -1524,6 +1843,10 @@ main() {
   step "Configuring Rust Toolchain"
   cargo_fix || warn "Proceeding without Rust toolchain - some AUR builds may fail"
   add_summary "Rust toolchain configured"
+
+  step "Selecting Optional Packages"
+  configure_optional_installs
+  add_summary "Optional desktop/developer package selection completed"
 
   step "Installing Official Repository Packages"
   install_pacman_packages
@@ -1558,9 +1881,15 @@ main() {
   set_default_shell
   add_summary "Default shell configured"
 
+  step "Configuring Keyboard and Language"
+  configure_keyboard_and_language
+
   step "Creating Configuration Backup"
   create_backup
   add_summary "Existing configurations backed up to ${BACKUP_DIR}"
+
+  step "Removing Noctalia State"
+  remove_noctalia_state
 
   step "Cloning Dotfiles Repository"
   clone_or_update_dotfiles
@@ -1574,6 +1903,16 @@ main() {
   create_symlinks
   add_summary "Configuration symlinks created in ~/.config"
 
+  step "Applying Keyboard and Language"
+  apply_keyboard_and_language_config
+  add_summary "Keyboard and language applied to Niri config"
+
+  step "Configuring MPD"
+  configure_mpd
+
+  step "Configuring User Environment"
+  ensure_sdl_videodriver
+
   step "Installing Wallpapers"
   install_wallpapers
   add_summary "Wallpapers installed to ~/Pictures/Wallpapers"
@@ -1585,6 +1924,8 @@ main() {
   step "Configuring System Services"
   create_systemd_services
   add_summary "Systemd services configured"
+
+  save_install_profile
 
   print_summary
 }
@@ -1603,6 +1944,9 @@ parse_arguments() {
       -v | --version)
         version
         exit 0
+        ;;
+      -r | --repair)
+        REPAIR_MODE=true
         ;;
       *)
         error "Unknown option: $1"

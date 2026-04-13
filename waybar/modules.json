@@ -177,17 +177,15 @@
     "Easy Effects Sink"
   ]
 },
-"backlight/slider": {
-  "min": 0,
-  "max": 100,
-  "orientation": "vertical",
-  "device": "intel_backlight"
-},
-"backlight": {
-  "device": "intel_backlight",
-  "format": "{icon}",
-  "format-icons": [
-    "󰃚",
+  "backlight/slider": {
+    "min": 0,
+    "max": 100,
+    "orientation": "vertical"
+  },
+  "backlight": {
+    "format": "{icon}",
+    "format-icons": [
+      "󰃚",
     "󰃛",
     "󰃜",
     "󰃝",

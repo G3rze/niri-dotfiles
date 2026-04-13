@@ -22,6 +22,11 @@ if [[ -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" ]] && [[ "$(tty)" == "/dev/
   exec dbus-run-session niri
 fi
 
+if [[ -o interactive ]] && [[ -t 1 ]] && [[ -z "${FASTFETCH_DONE:-}" ]] && command -v fastfetch >/dev/null 2>&1; then
+  export FASTFETCH_DONE=1
+  fastfetch
+fi
+
 ######################
 ### Key Bindings  ####
 ######################

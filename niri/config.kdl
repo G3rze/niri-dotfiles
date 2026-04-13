@@ -2,22 +2,15 @@
 spawn-sh-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &"
 spawn-at-startup "awww-daemon"
 spawn-at-startup "waybar"
-spawn-at-startup "sh" "-c" "vicinae server &"
 
 // General Settings
 prefer-no-csd
 screenshot-path "~/Pictures/Screenshots/%Y-%m-%d %H-%M-%S.png"
 
-output "eDP-1" {
-    mode "1920x1080@60.024"
-    scale 1
-}
-
 input {
     keyboard {
         xkb {
-            layout "latam"
-            options "caps:escape"
+            layout "us"
         }
     }
 
@@ -59,11 +52,11 @@ binds {
     // Application Shortcuts
     MOD+RETURN                          hotkey-overlay-title="Open Terminal: kitty" { spawn-sh "kitty"; }
     MOD+ALT+RETURN                      hotkey-overlay-title="Open Terminal: alacritty" { spawn-sh "alacritty"; }
-    MOD+ALT+B                         hotkey-overlay-title="Open Secondary Browser: chrome" { spawn-sh "google-chrome-stable --enable-features=TouchpadOverscrollHistoryNavigation"; }
+    MOD+ALT+B                         hotkey-overlay-title="Open Secondary Browser" { spawn-sh "$HOME/.config/scripts/open-browser.sh secondary"; }
     MOD+SHIFT+Q                         hotkey-overlay-title="Lock Screen: gtklock" { spawn-sh "gtklock"; }
     MOD+A                               hotkey-overlay-title="Open App Launcher: rofi" { spawn-sh "rofi -show drun"; }
-    MOD+B                              hotkey-overlay-title="Open Browser: zen-browser" { spawn-sh "zen-browser"; }
-    MOD+E                               hotkey-overlay-title="File Manager: Thunar" { spawn-sh "thunar"; }
+    MOD+B                              hotkey-overlay-title="Open Browser" { spawn-sh "$HOME/.config/scripts/open-browser.sh primary"; }
+    MOD+E                               hotkey-overlay-title="Open File Manager" { spawn-sh "$HOME/.config/scripts/open-file-manager.sh"; }
     MOD+ALT+E                           hotkey-overlay-title="File Manager: Yazi" { spawn-sh "yazi"; }
     MOD+W                               hotkey-overlay-title="Open Wallpaper Selector" { spawn-sh "$HOME/.config/scripts/bgselector.sh"; }
 
@@ -193,7 +186,7 @@ binds {
     MOD+S                               { screenshot; }
     MOD+SHIFT+S                         { screenshot-screen write-to-disk=true; }
     MOD+CTRL+S                          { screenshot-window write-to-disk=true; }
-    MOD+P                               { spawn-sh "pgrep -x hyprpicker >/dev/null || hyprpicker"; }
+    MOD+P                               { spawn-sh "pgrep -x hyprpicker >/dev/null || hyprpicker -a"; }
 
     // Application Restarts
     MOD+ALT+W                           { spawn "sh" "-c" "pgrep -x waybar >/dev/null && killall waybar || waybar &"; }
@@ -383,6 +376,7 @@ environment {
     ELECTRON_OZONE_PLATFORM_HINT "auto"
     XDG_SESSION_TYPE "wayland"
     XDG_CURRENT_DESKTOP "niri"
+    LANG "es_SV.UTF-8"
 
     // Wayland Platform Settings
     QT_QPA_PLATFORM "wayland"

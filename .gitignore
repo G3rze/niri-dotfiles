@@ -93,3 +93,15 @@ Notion/
 *.env
 *.swp.*
 temp.md
+
+# App runtime state kept out of portable dotfiles
+anytype/*
+!anytype/devconfig.json
+fish/fish_variables
+mpd/database
+mpd/mpd.log
+mpd/mpd.state
+mpd/sticker.sql
+mpd/mpd.pid
+mpd/playlists/*
+!mpd/playlists/.gitkeep

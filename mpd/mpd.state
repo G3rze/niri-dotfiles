@@ -1,8 +1,7 @@
-sw_volume: 67
+sw_volume: 100
 audio_device_state:1:MPD Pipewire Output
 state: stop
-current: 8
-random: 1
+random: 0
 repeat: 0
 single: 0
 consume: 0
@@ -11,14 +10,4 @@ mixrampdb: 0
 mixrampdelay: -1
 lastloadedplaylist: 
 playlist_begin
-0:Milo j/Milo j - 111/01. Milo j - TU MANTA.flac
-1:Milo j/Milo j - 111/02. Milo j - CARENCIAS DE CORDURA.flac
-2:Milo j/Milo j - 111/03. Milo j - M.A.I.flac
-3:Milo j/Milo j - 111/04. Milo j - DESEO PERDER (INTERLUDIO).flac
-4:Milo j/Milo j - 111/05. Milo j - SINCERA TE.flac
-5:Milo j/Milo j - 111/06. Milo j - TE FUI A SEGUIR.flac
-6:Milo j/Milo j - 111/07. Milo j - DOM1NGO.flac
-7:Milo j/Milo j - 111/08. Milo j - UNA BALA.flac
-8:Milo j/Milo j - 111/09. Milo j - ALUMBRE.flac
-9:Milo j/Milo j - 111/10. Milo j - A1RE.flac
 playlist_end

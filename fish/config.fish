@@ -35,6 +35,15 @@ if status is-interactive
     end
 end
 
+if status is-interactive
+    if test -t 1; and not set -q FASTFETCH_DONE
+        if command -sq fastfetch
+            set -gx FASTFETCH_DONE 1
+            fastfetch
+        end
+    end
+end
+
 #####################
 ### Key Bindings  ###
 #####################

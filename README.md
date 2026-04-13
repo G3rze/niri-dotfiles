@@ -50,6 +50,9 @@ _Dynamic theming • Borderless layouts • Minimal_
 - Clean borderless, gapless minimal look
 - Dynamic theme switching system-wide
 - Out-of-Box preconfigured for all popular themes and applications
+- Portable across multiple laptops without hardcoded panel/output assumptions
+- Interactive keyboard layout, XKB option, and language selection during install
+- Replaces existing Noctalia-based CachyOS Niri setups cleanly
 - Rust-powered tooling and packages (rust go brrr...)
 
 ## Automatic Installation (Recommended)
@@ -81,17 +84,21 @@ The automated installer will:
    Verify system compatibility (Arch-based only)
    Update your system packages
    Install base development tools (git, base-devel, curl)
+   Purge installed Noctalia packages from CachyOS Niri setups
    Set up AUR helper (yay)
    Configure Rust toolchain
    Install all required packages (niri, waybar, fish, etc.)
-   Install AUR packages (vicinae, wallust, etc.)
+   Install AUR packages (zen-browser, wallust, etc.)
    Install GTK themes (Colloid, Rose Pine, Osaka)
    Install icon themes (Colloid icons)
+   Let you choose keyboard layout, XKB options, and locale
+   Give you a keyboard test prompt before applying those settings
+   Backup existing configurations
+   Remove Noctalia / QuickShell state
    Clone and configure dotfiles
    Set up shell configuration (Fish/Zsh)
    Create systemd services
    Install wallpapers
-   Backup existing configurations
 ```
 
 Installation Time: Approximately 15-30 minutes depending on your internet speed.
@@ -132,7 +139,7 @@ Additional Tools
     Theme Manager: Wallust
     Prompt: Starship
     Authentication: Polkit-gnome
-    Utilities: dust, eza, niri-switch
+    Utilities: dust, eza, niri-switch, hyprpicker, playerctl, bottom
     Optional: Waydroid (Android container), Syncthing (file sync), Anytype (anytype-bin, AUR)
     Optional Dev Tools: nvm + Node.js LTS, OpenJDK, OpenAI Codex CLI (requires ChatGPT Plus or an OpenAI API key)
 
