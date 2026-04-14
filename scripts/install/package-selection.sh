@@ -300,3 +300,430 @@ configure_optional_installs() {
     add_summary "Optional AUR packages selected: ${SELECTED_OPTIONAL_AUR_PACKAGES[*]}"
   fi
 }
+
+detect_nvidia_arch_family() {
+  local gpu_name_lc="$1"
+
+  if [[ "${gpu_name_lc}" =~ rtx[[:space:]]?50|rtx[[:space:]]?40|rtx[[:space:]]?30|rtx[[:space:]]?20|a[0-9]{3,4}|ada|ampere|turing ]]; then
+    printf 'modern\n'
+    return 0
+  fi
+
+  if [[ "${gpu_name_lc}" =~ gtx[[:space:]]?10|gtx[[:space:]]?9|pascal|maxwell ]]; then
+    printf 'legacy470\n'
+    return 0
+  fi
+
+  if [[ "${gpu_name_lc}" =~ kepler|fermi|g[tf]x[[:space:]]?[4-8][0-9]{2} ]]; then
+    printf 'legacy390\n'
+    return 0
+  fi
+
+  printf 'unknown\n'
+}
+
+add_nvidia_driver_bundle() {
+  local driver_pkg="$1"
+
+  add_optional_package "${driver_pkg}"
+
+  case "${driver_pkg}" in
+    nvidia-dkms|nvidia)
+      add_optional_package "nvidia-utils"
+      add_optional_package "nvidia-settings"
+      add_optional_package "lib32-nvidia-utils"
+      ;;
+    nvidia-open-dkms|nvidia-open)
+      add_optional_package "nvidia-utils"
+      add_optional_package "nvidia-settings"
+      add_optional_package "lib32-nvidia-utils"
+      ;;
+    nvidia-470xx-dkms)
+      add_optional_package "nvidia-470xx-utils"
+      add_optional_package "nvidia-settings"
+      add_optional_package "lib32-nvidia-470xx-utils"
+      ;;
+    nvidia-390xx-dkms)
+      add_optional_package "nvidia-390xx-utils"
+      add_optional_package "nvidia-settings"
+      ;;
+  esac
+}
+
+select_nvidia_driver() {
+  local nvidia_name="$1"
+  local family recommended current_driver menu_max reply default_reply
+  local -a menu_labels=()
+  local -a menu_values=()
+
+  family="$(detect_nvidia_arch_family "$(printf '%s' "${nvidia_name}" | tr '[:upper:]' '[:lower:]')")"
+
+  case "${family}" in
+    modern) recommended="nvidia-dkms" ;;
+    legacy470) recommended="nvidia-470xx-dkms" ;;
+    legacy390) recommended="nvidia-390xx-dkms" ;;
+    *) recommended="" ;;
+  esac
+
+  current_driver=""
+  if pacman -Q nvidia-dkms >> "${LOG_FILE}" 2>&1; then
+    current_driver="nvidia-dkms"
+  elif pacman -Q nvidia-open-dkms >> "${LOG_FILE}" 2>&1; then
+    current_driver="nvidia-open-dkms"
+  elif pacman -Q nvidia >> "${LOG_FILE}" 2>&1; then
+    current_driver="nvidia"
+  elif pacman -Q nvidia-open >> "${LOG_FILE}" 2>&1; then
+    current_driver="nvidia-open"
+  elif pacman -Q nvidia-470xx-dkms >> "${LOG_FILE}" 2>&1; then
+    current_driver="nvidia-470xx-dkms"
+  elif pacman -Q nvidia-390xx-dkms >> "${LOG_FILE}" 2>&1; then
+    current_driver="nvidia-390xx-dkms"
+  fi
+
+  if [[ -n "${current_driver}" ]]; then
+    menu_labels+=("Keep current NVIDIA driver config (${current_driver})")
+    menu_values+=("${current_driver}")
+  fi
+
+  menu_labels+=("Skip NVIDIA driver changes")
+  menu_values+=("")
+
+  if [[ -n "${recommended}" ]]; then
+    menu_labels+=("Recommended for detected GPU (${family}): ${recommended}")
+    menu_values+=("${recommended}")
+  fi
+
+  menu_labels+=("nvidia-dkms (proprietary, broad kernel support)")
+  menu_values+=("nvidia-dkms")
+  menu_labels+=("nvidia-open-dkms (open kernel module)")
+  menu_values+=("nvidia-open-dkms")
+  menu_labels+=("nvidia (prebuilt for standard kernel)")
+  menu_values+=("nvidia")
+  menu_labels+=("nvidia-open (prebuilt open kernel module)")
+  menu_values+=("nvidia-open")
+  menu_labels+=("nvidia-470xx-dkms (legacy branch)")
+  menu_values+=("nvidia-470xx-dkms")
+  menu_labels+=("nvidia-390xx-dkms (older legacy branch)")
+  menu_values+=("nvidia-390xx-dkms")
+
+  printf "\n"
+  printf "${BLUE}${BOLD}NVIDIA Driver Selection${NC}\n"
+  printf "Detected NVIDIA GPU: %s\n" "${nvidia_name}"
+  if [[ -n "${recommended}" ]]; then
+    printf "Architecture family: %s (recommended: %s)\n" "${family}" "${recommended}"
+  else
+    printf "Architecture family: unknown (manual selection recommended)\n"
+  fi
+  printf "\n"
+
+  local i=1
+  for label in "${menu_labels[@]}"; do
+    printf "  %d) %s\n" "${i}" "${label}"
+    ((i++)) || true
+  done
+  printf "\n"
+
+  menu_max=${#menu_values[@]}
+  default_reply=1
+  if [[ -z "${current_driver}" ]] && [[ -n "${recommended}" ]]; then
+    default_reply=2
+  fi
+  read -r -p "Choose NVIDIA driver option (1-${menu_max}) [default: ${default_reply}]: " reply < /dev/tty
+
+  if [[ -z "${reply}" ]]; then
+    reply="${default_reply}"
+  fi
+
+  if [[ ! "${reply}" =~ ^[0-9]+$ ]] || (( reply < 1 || reply > menu_max )); then
+    warn "Invalid NVIDIA driver selection. Skipping NVIDIA driver changes."
+    SELECTED_NVIDIA_DRIVER_PACKAGE=""
+    return 0
+  fi
+
+  SELECTED_NVIDIA_DRIVER_PACKAGE="${menu_values[$((reply - 1))]}"
+
+  if [[ -n "${SELECTED_NVIDIA_DRIVER_PACKAGE}" ]]; then
+    add_nvidia_driver_bundle "${SELECTED_NVIDIA_DRIVER_PACKAGE}"
+    msg "Selected NVIDIA driver package: ${SELECTED_NVIDIA_DRIVER_PACKAGE}"
+  else
+    info "Skipping NVIDIA driver package changes."
+  fi
+}
+
+select_intel_driver_bundle() {
+  local reply current_intel_profile default_reply
+
+  current_intel_profile=""
+  if pacman -Q mesa >> "${LOG_FILE}" 2>&1 &&
+    pacman -Q vulkan-intel >> "${LOG_FILE}" 2>&1 &&
+    pacman -Q intel-media-driver >> "${LOG_FILE}" 2>&1; then
+    current_intel_profile="recommended"
+  elif pacman -Q mesa >> "${LOG_FILE}" 2>&1 &&
+    pacman -Q vulkan-intel >> "${LOG_FILE}" 2>&1 &&
+    pacman -Q libva-intel-driver >> "${LOG_FILE}" 2>&1; then
+    current_intel_profile="compat"
+  fi
+
+  printf "\n"
+  printf "${BLUE}${BOLD}Intel Driver Selection${NC}\n"
+  local option=1
+  declare -A intel_options=()
+  if [[ -n "${current_intel_profile}" ]]; then
+    if [[ "${current_intel_profile}" == "recommended" ]]; then
+      printf "  %d) Keep current Intel driver config (mesa + vulkan-intel + intel-media-driver)\n" "${option}"
+    else
+      printf "  %d) Keep current Intel driver config (mesa + vulkan-intel + libva-intel-driver)\n" "${option}"
+    fi
+    intel_options[${option}]="${current_intel_profile}"
+    ((option++)) || true
+  fi
+  printf "  %d) Skip Intel driver package changes\n" "${option}"
+  intel_options[${option}]="skip"
+  ((option++)) || true
+  printf "  %d) Recommended: mesa + vulkan-intel + intel-media-driver\n" "${option}"
+  intel_options[${option}]="recommended"
+  ((option++)) || true
+  printf "  %d) Compatibility: mesa + vulkan-intel + libva-intel-driver\n" "${option}"
+  intel_options[${option}]="compat"
+  printf "\n"
+
+  default_reply=1
+  if [[ -z "${current_intel_profile}" ]]; then
+    default_reply=2
+  fi
+  read -r -p "Choose Intel driver option (1-$((option - 1))) [default: ${default_reply}]: " reply < /dev/tty
+  if [[ -z "${reply}" ]]; then
+    reply="${default_reply}"
+  fi
+
+  case "${intel_options[${reply}]:-skip}" in
+    recommended)
+      SELECTED_INTEL_DRIVER_PROFILE="recommended"
+      add_optional_package "mesa"
+      add_optional_package "vulkan-intel"
+      add_optional_package "intel-media-driver"
+      msg "Selected Intel driver bundle: mesa + vulkan-intel + intel-media-driver"
+      ;;
+    compat)
+      SELECTED_INTEL_DRIVER_PROFILE="compat"
+      add_optional_package "mesa"
+      add_optional_package "vulkan-intel"
+      add_optional_package "libva-intel-driver"
+      msg "Selected Intel driver bundle: mesa + vulkan-intel + libva-intel-driver"
+      ;;
+    *)
+      SELECTED_INTEL_DRIVER_PROFILE="skip"
+      info "Skipping Intel driver package changes."
+      ;;
+  esac
+}
+
+select_amd_driver_bundle() {
+  local reply current_amd_profile default_reply
+
+  current_amd_profile=""
+  if pacman -Q mesa >> "${LOG_FILE}" 2>&1 &&
+    pacman -Q vulkan-radeon >> "${LOG_FILE}" 2>&1 &&
+    pacman -Q libva-mesa-driver >> "${LOG_FILE}" 2>&1; then
+    current_amd_profile="recommended"
+  elif pacman -Q mesa >> "${LOG_FILE}" 2>&1; then
+    current_amd_profile="minimal"
+  fi
+
+  printf "\n"
+  printf "${BLUE}${BOLD}AMD Driver Selection${NC}\n"
+  local option=1
+  declare -A amd_options=()
+  if [[ -n "${current_amd_profile}" ]]; then
+    if [[ "${current_amd_profile}" == "recommended" ]]; then
+      printf "  %d) Keep current AMD driver config (mesa + vulkan-radeon + libva-mesa-driver)\n" "${option}"
+    else
+      printf "  %d) Keep current AMD driver config (mesa only)\n" "${option}"
+    fi
+    amd_options[${option}]="${current_amd_profile}"
+    ((option++)) || true
+  fi
+  printf "  %d) Skip AMD driver package changes\n" "${option}"
+  amd_options[${option}]="skip"
+  ((option++)) || true
+  printf "  %d) Recommended: mesa + vulkan-radeon + libva-mesa-driver\n" "${option}"
+  amd_options[${option}]="recommended"
+  ((option++)) || true
+  printf "  %d) Minimal: mesa only\n" "${option}"
+  amd_options[${option}]="minimal"
+  printf "\n"
+
+  default_reply=1
+  if [[ -z "${current_amd_profile}" ]]; then
+    default_reply=2
+  fi
+  read -r -p "Choose AMD driver option (1-$((option - 1))) [default: ${default_reply}]: " reply < /dev/tty
+  if [[ -z "${reply}" ]]; then
+    reply="${default_reply}"
+  fi
+
+  case "${amd_options[${reply}]:-skip}" in
+    recommended)
+      SELECTED_AMD_DRIVER_PROFILE="recommended"
+      add_optional_package "mesa"
+      add_optional_package "vulkan-radeon"
+      add_optional_package "libva-mesa-driver"
+      msg "Selected AMD driver bundle: mesa + vulkan-radeon + libva-mesa-driver"
+      ;;
+    minimal)
+      SELECTED_AMD_DRIVER_PROFILE="minimal"
+      add_optional_package "mesa"
+      msg "Selected AMD driver bundle: mesa only"
+      ;;
+    *)
+      SELECTED_AMD_DRIVER_PROFILE="skip"
+      info "Skipping AMD driver package changes."
+      ;;
+  esac
+}
+
+configure_gpu_driver_selection() {
+  local intel_line amd_line nvidia_line reply
+
+  if ! command -v lspci >/dev/null 2>&1; then
+    warn "lspci is not available; skipping GPU-specific driver/session setup."
+    SELECTED_GPU_SESSION_MODE="auto"
+    return 0
+  fi
+
+  if [[ "${REPAIR_MODE}" == "true" ]] && [[ "${INSTALL_PROFILE_LOADED}" == "true" ]]; then
+    info "Repair mode: reusing saved GPU session and driver selections."
+    case "${SELECTED_INTEL_DRIVER_PROFILE:-}" in
+      recommended)
+        add_optional_package "mesa"
+        add_optional_package "vulkan-intel"
+        add_optional_package "intel-media-driver"
+        ;;
+      compat)
+        add_optional_package "mesa"
+        add_optional_package "vulkan-intel"
+        add_optional_package "libva-intel-driver"
+        ;;
+    esac
+    case "${SELECTED_AMD_DRIVER_PROFILE:-}" in
+      recommended)
+        add_optional_package "mesa"
+        add_optional_package "vulkan-radeon"
+        add_optional_package "libva-mesa-driver"
+        ;;
+      minimal)
+        add_optional_package "mesa"
+        ;;
+    esac
+    if [[ -n "${SELECTED_NVIDIA_DRIVER_PACKAGE}" ]]; then
+      add_nvidia_driver_bundle "${SELECTED_NVIDIA_DRIVER_PACKAGE}"
+    fi
+    add_summary "GPU mode (reused): ${SELECTED_GPU_SESSION_MODE}"
+    if [[ -n "${SELECTED_INTEL_DRIVER_PROFILE:-}" ]]; then
+      add_summary "Intel driver profile (reused): ${SELECTED_INTEL_DRIVER_PROFILE}"
+    fi
+    if [[ -n "${SELECTED_AMD_DRIVER_PROFILE:-}" ]]; then
+      add_summary "AMD driver profile (reused): ${SELECTED_AMD_DRIVER_PROFILE}"
+    fi
+    if [[ -n "${SELECTED_NVIDIA_DRIVER_PACKAGE}" ]]; then
+      add_summary "NVIDIA driver selected (reused): ${SELECTED_NVIDIA_DRIVER_PACKAGE}"
+    fi
+    return 0
+  fi
+
+  intel_line="$(lspci -nn | grep -Ei 'VGA|3D|Display' | grep -Ei 'Intel' | head -n 1 || true)"
+  amd_line="$(lspci -nn | grep -Ei 'VGA|3D|Display' | grep -Ei 'AMD|Advanced Micro Devices|ATI' | head -n 1 || true)"
+  nvidia_line="$(lspci -nn | grep -Ei 'VGA|3D|Display' | grep -Ei 'NVIDIA' | head -n 1 || true)"
+
+  DETECTED_GPU_INTEL_NAME=""
+  DETECTED_GPU_AMD_NAME=""
+  DETECTED_GPU_NVIDIA_NAME=""
+  SELECTED_INTEL_DRIVER_PROFILE="skip"
+  SELECTED_AMD_DRIVER_PROFILE="skip"
+  SELECTED_NVIDIA_DRIVER_PACKAGE=""
+
+  if [[ -n "${intel_line}" ]]; then
+    DETECTED_GPU_INTEL_NAME="$(printf '%s' "${intel_line}" | sed -E 's/.*: (.*) \[[0-9a-fA-F]{4}:[0-9a-fA-F]{4}\].*/\1/')"
+  fi
+  if [[ -n "${amd_line}" ]]; then
+    DETECTED_GPU_AMD_NAME="$(printf '%s' "${amd_line}" | sed -E 's/.*: (.*) \[[0-9a-fA-F]{4}:[0-9a-fA-F]{4}\].*/\1/')"
+  fi
+  if [[ -n "${nvidia_line}" ]]; then
+    DETECTED_GPU_NVIDIA_NAME="$(printf '%s' "${nvidia_line}" | sed -E 's/.*: (.*) \[[0-9a-fA-F]{4}:[0-9a-fA-F]{4}\].*/\1/')"
+  fi
+
+  printf "\n"
+  printf "${BLUE}${BOLD}GPU Detection${NC}\n"
+  if [[ -n "${DETECTED_GPU_INTEL_NAME}" ]]; then
+    printf "  - Intel:   %s\n" "${DETECTED_GPU_INTEL_NAME}"
+  fi
+  if [[ -n "${DETECTED_GPU_AMD_NAME}" ]]; then
+    printf "  - AMD:     %s\n" "${DETECTED_GPU_AMD_NAME}"
+  fi
+  if [[ -n "${DETECTED_GPU_NVIDIA_NAME}" ]]; then
+    printf "  - NVIDIA:  %s\n" "${DETECTED_GPU_NVIDIA_NAME}"
+  fi
+  if [[ -z "${DETECTED_GPU_INTEL_NAME}" ]] && [[ -z "${DETECTED_GPU_AMD_NAME}" ]] && [[ -z "${DETECTED_GPU_NVIDIA_NAME}" ]]; then
+    warn "No supported GPU detected from lspci output. Keeping automatic mode."
+    SELECTED_GPU_SESSION_MODE="auto"
+    return 0
+  fi
+  printf "\n"
+
+  printf "${BLUE}${BOLD}Niri Session GPU Mode${NC}\n"
+  local option=1
+  local -A gpu_mode_options=()
+  printf "  %d) auto (default)\n" "${option}"
+  gpu_mode_options[${option}]="auto"
+  ((option++)) || true
+
+  if [[ -n "${DETECTED_GPU_INTEL_NAME}" ]]; then
+    printf "  %d) intel\n" "${option}"
+    gpu_mode_options[${option}]="intel"
+    ((option++)) || true
+  fi
+
+  if [[ -n "${DETECTED_GPU_NVIDIA_NAME}" ]]; then
+    printf "  %d) nvidia\n" "${option}"
+    gpu_mode_options[${option}]="nvidia"
+    ((option++)) || true
+  fi
+
+  if [[ -n "${DETECTED_GPU_AMD_NAME}" ]]; then
+    printf "  %d) amd\n" "${option}"
+    gpu_mode_options[${option}]="amd"
+    ((option++)) || true
+  fi
+
+  printf "\n"
+  read -r -p "Choose default GPU mode for SDDM Niri sessions [default: 1]: " reply < /dev/tty
+
+  if [[ -z "${reply}" ]]; then
+    reply="1"
+  fi
+
+  SELECTED_GPU_SESSION_MODE="${gpu_mode_options[${reply}]:-auto}"
+
+  if [[ -n "${DETECTED_GPU_INTEL_NAME}" ]]; then
+    select_intel_driver_bundle
+  fi
+
+  if [[ -n "${DETECTED_GPU_AMD_NAME}" ]]; then
+    select_amd_driver_bundle
+  fi
+
+  if [[ -n "${DETECTED_GPU_NVIDIA_NAME}" ]]; then
+    select_nvidia_driver "${DETECTED_GPU_NVIDIA_NAME}"
+  fi
+
+  add_summary "GPU mode: ${SELECTED_GPU_SESSION_MODE}"
+  if [[ -n "${DETECTED_GPU_INTEL_NAME}" ]]; then
+    add_summary "Intel driver profile: ${SELECTED_INTEL_DRIVER_PROFILE}"
+  fi
+  if [[ -n "${DETECTED_GPU_AMD_NAME}" ]]; then
+    add_summary "AMD driver profile: ${SELECTED_AMD_DRIVER_PROFILE}"
+  fi
+  if [[ -n "${SELECTED_NVIDIA_DRIVER_PACKAGE}" ]]; then
+    add_summary "NVIDIA driver selected: ${SELECTED_NVIDIA_DRIVER_PACKAGE}"
+  fi
+}

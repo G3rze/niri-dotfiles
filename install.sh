@@ -10,6 +10,9 @@ IFS=$'\n\t'
 readonly REPO_URL="https://github.com/G3rze/niri-dotfiles.git"
 readonly DOTDIR="${DOTDIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 readonly CONFIG_DIR="${HOME}/.config"
+readonly SEVENS_DATA_DIR="${HOME}/.local/share/sevens-dots"
+readonly COLD_CONFIG_DIR="${SEVENS_DATA_DIR}/cold-config"
+readonly RUNTIME_CONFIG_DIR="${SEVENS_DATA_DIR}/runtime-config"
 readonly BACKUP_DIR="${HOME}/.config_backup_$(date +%Y%m%d_%H%M%S)"
 readonly LOG_DIR="${HOME}/.cache"
 readonly LOG_FILE="${LOG_DIR}/sevens-dots-install-$(date +%Y%m%d_%H%M%S).log"
@@ -18,6 +21,7 @@ readonly INSTALL_PROFILE_FILE="${INSTALL_STATE_DIR}/install-profile.sh"
 readonly USER_ENV_DIR="${HOME}/.config/environment.d"
 readonly SDL_ENV_FILE="${USER_ENV_DIR}/90-sdl-videodriver.conf"
 readonly SDL_VIDEODRIVER_VALUE="wayland,x11"
+readonly WAYLAND_SESSIONS_DIR="/usr/share/wayland-sessions"
 readonly NOCTALIA_PATHS=(
   "${HOME}/.config/noctalia"
   "${HOME}/.config/quickshell"
@@ -35,7 +39,7 @@ AUR_HELPER=""
 
 # Progress tracking
 CURRENT_STEP=0
-readonly TOTAL_STEPS=28
+readonly TOTAL_STEPS=30
 
 # Installation summary tracking
 declare -a INSTALL_SUMMARY=()
@@ -68,6 +72,13 @@ INSTALL_NVM=false
 INSTALL_NODE_LTS=false
 INSTALL_CODEX_CLI=false
 SELECTED_JAVA_PACKAGE=""
+SELECTED_GPU_SESSION_MODE="auto"
+SELECTED_INTEL_DRIVER_PROFILE=""
+SELECTED_AMD_DRIVER_PROFILE=""
+SELECTED_NVIDIA_DRIVER_PACKAGE=""
+DETECTED_GPU_INTEL_NAME=""
+DETECTED_GPU_AMD_NAME=""
+DETECTED_GPU_NVIDIA_NAME=""
 
 declare -a SELECTED_OPTIONAL_PACMAN_PACKAGES=()
 declare -a SELECTED_OPTIONAL_AUR_PACKAGES=()
@@ -108,7 +119,7 @@ readonly AUR_PACKAGES=(
 readonly PACMAN_PACKAGES=(
   niri waybar fish fastfetch mako alacritty kitty starship neovim yazi
   zathura zathura-pdf-mupdf ttf-jetbrains-mono-nerd
-  noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
+  noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra pciutils
   qt5-wayland qt6-wayland polkit-gnome ffmpeg imagemagick unzip jq
   gtklock gtklock-userinfo-module rofi curl libnotify brightnessctl firefox hyprpicker playerctl awww mpd rmpc
   cliphist wl-clipboard
@@ -1903,6 +1914,10 @@ main() {
   configure_optional_installs
   add_summary "Optional desktop/developer package selection completed"
 
+  step "Selecting GPU Session and Graphics Drivers"
+  configure_gpu_driver_selection
+  add_summary "GPU session mode selected: ${SELECTED_GPU_SESSION_MODE}"
+
   step "Installing Official Repository Packages"
   install_pacman_packages
   add_summary "Official packages installed (niri, waybar, fish, etc.)"
@@ -1971,6 +1986,7 @@ main() {
 
   step "Configuring User Environment"
   ensure_sdl_videodriver
+  install_gpu_session_entries
 
   step "Installing Wallpapers"
   install_wallpapers

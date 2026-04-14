@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+IFS=$'\n\t'
 
 resolve_script_path() {
   local source="${BASH_SOURCE[0]}"
@@ -16,31 +17,330 @@ resolve_script_path() {
 readonly SCRIPT_DIR="$(resolve_script_path)"
 readonly DOTFILES_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 readonly PROFILE_HELPER="${DOTFILES_DIR}/scripts/set-profile-picture.sh"
+readonly INSTALL_SCRIPT="${DOTFILES_DIR}/install.sh"
+readonly INSTALL_PROFILE_FILE="${HOME}/.local/state/sevens-dots/install-profile.sh"
+readonly CONFIG_DIR="${HOME}/.config"
+readonly SEVENS_DATA_DIR="${HOME}/.local/share/sevens-dots"
+readonly COLD_CONFIG_DIR="${SEVENS_DATA_DIR}/cold-config"
+readonly RUNTIME_CONFIG_DIR="${SEVENS_DATA_DIR}/runtime-config"
+
+declare -a SELECTED_OPTIONAL_PACMAN_PACKAGES=()
+declare -a SELECTED_OPTIONAL_AUR_PACKAGES=()
+
+print_info() {
+  printf '[INFO] %s\n' "$1" >&2
+}
+
+print_warn() {
+  printf '[WARN] %s\n' "$1" >&2
+}
+
+print_error() {
+  printf '[ERROR] %s\n' "$1" >&2
+}
+
+require_command() {
+  local cmd="$1"
+  if ! command -v "${cmd}" >/dev/null 2>&1; then
+    print_error "Missing required command: ${cmd}"
+    exit 1
+  fi
+}
+
+prompt_yes_no() {
+  local prompt="$1"
+  local default_answer="${2:-N}"
+  local reply
+
+  read -r -p "${prompt}" reply < /dev/tty
+  if [[ -z "${reply}" ]]; then
+    reply="${default_answer}"
+  fi
+
+  [[ "${reply}" =~ ^[Yy]$ ]]
+}
+
+append_unique() {
+  local value="$1"
+  shift
+  local -n array_ref="$1"
+  local existing
+
+  for existing in "${array_ref[@]}"; do
+    [[ "${existing}" == "${value}" ]] && return 0
+  done
+  array_ref+=("${value}")
+}
+
+extract_install_array_values() {
+  local array_name="$1"
+  local line token in_block=false
+
+  while IFS= read -r line; do
+    if [[ "${line}" =~ ^readonly[[:space:]]+${array_name}=\( ]]; then
+      in_block=true
+      continue
+    fi
+
+    if [[ "${in_block}" == "true" ]] && [[ "${line}" =~ ^[[:space:]]*\)[[:space:]]*$ ]]; then
+      break
+    fi
+
+    if [[ "${in_block}" == "true" ]]; then
+      line="${line%%#*}"
+      for token in ${line}; do
+        token="${token%\"}"
+        token="${token#\"}"
+        token="${token%\'}"
+        token="${token#\'}"
+        [[ -z "${token}" ]] && continue
+        printf '%s\n' "${token}"
+      done
+    fi
+  done < "${INSTALL_SCRIPT}"
+}
+
+load_install_profile_optional_arrays() {
+  if [[ ! -f "${INSTALL_PROFILE_FILE}" ]]; then
+    return 0
+  fi
+
+  # shellcheck disable=SC1090
+  source "${INSTALL_PROFILE_FILE}"
+}
+
+get_offered_packages() {
+  local pkg
+  local -a offered=()
+
+  while IFS= read -r pkg; do
+    [[ -n "${pkg}" ]] && append_unique "${pkg}" offered
+  done < <(extract_install_array_values "PACMAN_PACKAGES")
+
+  while IFS= read -r pkg; do
+    [[ -n "${pkg}" ]] && append_unique "${pkg}" offered
+  done < <(extract_install_array_values "AUR_PACKAGES")
+
+  load_install_profile_optional_arrays
+
+  for pkg in "${SELECTED_OPTIONAL_PACMAN_PACKAGES[@]}"; do
+    [[ -n "${pkg}" ]] && append_unique "${pkg}" offered
+  done
+
+  for pkg in "${SELECTED_OPTIONAL_AUR_PACKAGES[@]}"; do
+    [[ -n "${pkg}" ]] && append_unique "${pkg}" offered
+  done
+
+  printf '%s\n' "${offered[@]}"
+}
+
+trace_offered_installed_packages() {
+  local pkg
+  local -a offered=()
+  local -a installed=()
+
+  while IFS= read -r pkg; do
+    [[ -n "${pkg}" ]] && offered+=("${pkg}")
+  done < <(get_offered_packages)
+
+  for pkg in "${offered[@]}"; do
+    if pacman -Q "${pkg}" >/dev/null 2>&1; then
+      installed+=("${pkg}")
+    fi
+  done
+
+  print_info "Offered packages in installer: ${#offered[@]}"
+  print_info "Installed packages from installer set: ${#installed[@]}"
+
+  if [[ ${#installed[@]} -gt 0 ]]; then
+    printf '%s\n' "${installed[@]}"
+  fi
+}
+
+list_installed_offered_packages() {
+  local pkg
+  local -a offered=()
+  local -a installed=()
+
+  while IFS= read -r pkg; do
+    [[ -n "${pkg}" ]] && offered+=("${pkg}")
+  done < <(get_offered_packages)
+
+  for pkg in "${offered[@]}"; do
+    if pacman -Q "${pkg}" >/dev/null 2>&1; then
+      installed+=("${pkg}")
+    fi
+  done
+
+  printf '%s\n' "${installed[@]}"
+}
+
+validate_installed_package_integrity() {
+  local -a installed=()
+  local pkg
+
+  while IFS= read -r pkg; do
+    [[ -n "${pkg}" ]] && installed+=("${pkg}")
+  done < <(list_installed_offered_packages)
+
+  if [[ ${#installed[@]} -eq 0 ]]; then
+    print_warn "No installer-tracked packages are currently installed."
+    return 0
+  fi
+
+  print_info "Running package integrity check with pacman -Qkk..."
+  if ! sudo pacman -Qkk "${installed[@]}"; then
+    print_warn "Integrity check reported issues. Review output above."
+  fi
+}
+
+update_system_with_discord_prompt() {
+  local update_discord=true
+
+  if pacman -Q discord >/dev/null 2>&1; then
+    if ! prompt_yes_no "Discord is installed. Include Discord in full update? (y/N): " "N"; then
+      update_discord=false
+    fi
+  fi
+
+  print_info "Updating system packages..."
+  if [[ "${update_discord}" == "true" ]]; then
+    sudo pacman -Syu --noconfirm
+  else
+    sudo pacman -Syu --noconfirm --ignore discord
+    print_warn "Discord was excluded from this update."
+  fi
+}
+
+extract_config_folders() {
+  extract_install_array_values "CONFIG_FOLDERS"
+}
+
+ensure_runtime_folder_from_sources() {
+  local folder="$1"
+  local runtime_dir="${RUNTIME_CONFIG_DIR}/${folder}"
+  local cold_dir="${COLD_CONFIG_DIR}/${folder}"
+  local repo_dir="${DOTFILES_DIR}/${folder}"
+
+  if [[ -d "${runtime_dir}" ]]; then
+    return 0
+  fi
+
+  mkdir -p "${RUNTIME_CONFIG_DIR}" "${COLD_CONFIG_DIR}"
+
+  if [[ -d "${cold_dir}" ]]; then
+    cp -a "${cold_dir}" "${runtime_dir}"
+    return 0
+  fi
+
+  if [[ -d "${repo_dir}" ]]; then
+    cp -a "${repo_dir}" "${cold_dir}"
+    cp -a "${cold_dir}" "${runtime_dir}"
+  fi
+}
+
+repair_broken_config_symlinks() {
+  local folder target expected now
+  local repaired=0
+
+  while IFS= read -r folder; do
+    [[ -z "${folder}" ]] && continue
+    [[ "${folder}" == "mpd" ]] && continue
+
+    target="${CONFIG_DIR}/${folder}"
+    expected="${RUNTIME_CONFIG_DIR}/${folder}"
+    ensure_runtime_folder_from_sources "${folder}"
+
+    if [[ -L "${target}" ]] && [[ "$(readlink -f "${target}")" == "$(readlink -f "${expected}")" ]]; then
+      continue
+    fi
+
+    if [[ -e "${target}" ]] || [[ -L "${target}" ]]; then
+      now="$(date +%Y%m%d_%H%M%S)"
+      mv "${target}" "${target}.pre-repair.${now}"
+      print_warn "Backed up broken target: ${target} -> ${target}.pre-repair.${now}"
+    fi
+
+    ln -sfn "${expected}" "${target}"
+    repaired=$((repaired + 1))
+  done < <(extract_config_folders)
+
+  print_info "Symlink repair completed. Repaired entries: ${repaired}"
+}
+
+run_repair_system() {
+  require_command sudo
+  require_command pacman
+  require_command git
+
+  trace_offered_installed_packages >/dev/null
+  validate_installed_package_integrity
+  update_system_with_discord_prompt
+  repair_broken_config_symlinks
+}
+
+detect_default_branch() {
+  local branch
+  branch="$(git -C "${DOTFILES_DIR}" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || true)"
+  branch="${branch#origin/}"
+  if [[ -z "${branch}" ]]; then
+    if git -C "${DOTFILES_DIR}" show-ref --verify --quiet refs/remotes/origin/main; then
+      branch="main"
+    else
+      branch="master"
+    fi
+  fi
+  printf '%s\n' "${branch}"
+}
+
+run_update() {
+  local default_branch
+
+  require_command git
+  require_command bash
+
+  if [[ ! -d "${DOTFILES_DIR}/.git" ]]; then
+    print_error "Dotfiles directory is not a git repository: ${DOTFILES_DIR}"
+    exit 1
+  fi
+
+  default_branch="$(detect_default_branch)"
+  print_info "Forcing repository sync with origin/${default_branch}..."
+  git -C "${DOTFILES_DIR}" fetch --all --prune
+  git -C "${DOTFILES_DIR}" reset --hard "origin/${default_branch}"
+  git -C "${DOTFILES_DIR}" submodule update --init --recursive --force
+
+  print_info "Running installer in repair mode after update..."
+  exec bash "${INSTALL_SCRIPT}" --repair
+}
 
 print_help() {
   cat <<'EOF'
-gerzeos - small helper CLI for local system tweaks
+gerzeos - helper CLI for local system maintenance
 
 Usage:
   gerzeos --set-profile-picture <path>
+  gerzeos -s <path>
+  gerzeos --repair-system
+  gerzeos -r
+  gerzeos --update
+  gerzeos -u
   gerzeos -h
   gerzeos --help
 
 Commands:
-  --set-profile-picture <path>
+  --set-profile-picture, -s <path>
       Set one profile picture for both SDDM and gtklock.
       The image is center-cropped to a square and resized to 256x256.
 
-Supported image formats:
-  Any format readable by ImageMagick's 'magick' command.
-  Common formats: .png .jpg .jpeg .webp .bmp .tif .tiff .gif .avif
+  --repair-system, -r
+      Trace installer-offered packages currently installed, validate package
+      integrity, update the system (prompting for Discord update policy), and
+      repair broken managed config symlinks.
 
-Notes:
-  This command updates:
-    /var/lib/AccountsService/icons/<user>
-    /var/lib/AccountsService/users/<user>
-    /usr/share/sddm/faces/<user>.face.icon
-  Root access is required for the final install step.
+  --update, -u
+      Force-sync the niri-dotfiles repository with origin (hard reset), then
+      run install.sh --repair to reapply managed setup.
 EOF
 }
 
@@ -51,20 +351,26 @@ main() {
   fi
 
   case "${1}" in
-    --set-profile-picture)
+    --set-profile-picture|-s)
       shift
       if [[ $# -ne 1 ]]; then
-        printf 'error: --set-profile-picture requires exactly one path\n' >&2
+        print_error "--set-profile-picture requires exactly one path"
         print_help >&2
         exit 1
       fi
       exec "${PROFILE_HELPER}" "$1"
       ;;
+    --repair-system|-r)
+      run_repair_system
+      ;;
+    --update|-u)
+      run_update
+      ;;
     -h|--help)
       print_help
       ;;
     *)
-      printf 'error: unknown argument: %s\n' "${1}" >&2
+      print_error "Unknown argument: ${1}"
       print_help >&2
       exit 1
       ;;

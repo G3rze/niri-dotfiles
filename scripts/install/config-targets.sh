@@ -25,6 +25,26 @@ link_entry() {
   return 1
 }
 
+sync_folder_to_cold_config() {
+  local folder="$1"
+  local source_dir="${DOTDIR}/${folder}"
+  local cold_dir="${COLD_CONFIG_DIR}/${folder}"
+
+  rm -rf "${cold_dir}"
+  mkdir -p "$(dirname "${cold_dir}")"
+  cp -a "${source_dir}" "${cold_dir}"
+}
+
+sync_folder_to_runtime_config() {
+  local folder="$1"
+  local cold_dir="${COLD_CONFIG_DIR}/${folder}"
+  local runtime_dir="${RUNTIME_CONFIG_DIR}/${folder}"
+
+  rm -rf "${runtime_dir}"
+  mkdir -p "$(dirname "${runtime_dir}")"
+  cp -a "${cold_dir}" "${runtime_dir}"
+}
+
 setup_fish_config() {
   local source_dir="${DOTDIR}/fish"
   local target_dir="${CONFIG_DIR}/fish"
@@ -73,9 +93,12 @@ create_symlinks() {
   local linked=0
   local skipped=0
 
+  mkdir -p "${COLD_CONFIG_DIR}" "${RUNTIME_CONFIG_DIR}"
+
   for folder in "${CONFIG_FOLDERS[@]}"; do
     local source_dir="${DOTDIR}/${folder}"
     local target="${CONFIG_DIR}/${folder}"
+    local runtime_dir="${RUNTIME_CONFIG_DIR}/${folder}"
 
     if [[ ! -d "${source_dir}" ]]; then
       info "Skipping: ${folder} (not found in repository)"
@@ -93,26 +116,22 @@ create_symlinks() {
     fi
 
     case "${folder}" in
-      fish)
-        setup_fish_config
-        ((++linked)) || true
-        ;;
-      anytype)
-        setup_anytype_config
-        ((++linked)) || true
-        ;;
       mpd)
         setup_mpd_config_dir
         ((++linked)) || true
         ;;
       *)
-        if link_entry "${source_dir}" "${target}"; then
+        sync_folder_to_cold_config "${folder}"
+        sync_folder_to_runtime_config "${folder}"
+        if link_entry "${runtime_dir}" "${target}"; then
           ((++linked)) || true
         fi
         ;;
     esac
   done
 
+  add_summary "Cold config snapshot: ${COLD_CONFIG_DIR}"
+  add_summary "Runtime config mirror: ${RUNTIME_CONFIG_DIR}"
   msg "Created ${linked} config target(s), skipped ${skipped}."
 }
 

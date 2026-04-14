@@ -59,6 +59,83 @@ EOF
   msg "Configured SDL_VIDEODRIVER=${SDL_VIDEODRIVER_VALUE}"
 }
 
+detect_gpu_name_by_vendor() {
+  local vendor_regex="$1"
+  if ! command -v lspci >/dev/null 2>&1; then
+    printf '\n'
+    return 0
+  fi
+  lspci -nn | grep -Ei 'VGA|3D|Display' | grep -Ei "${vendor_regex}" | head -n 1 | sed -E 's/.*: (.*) \[[0-9a-fA-F]{4}:[0-9a-fA-F]{4}\].*/\1/' || true
+}
+
+create_wayland_session_entry() {
+  local file_name="$1"
+  local session_name="$2"
+  local session_mode="$3"
+  local target_dir="$4"
+  local wrapper="${HOME}/.config/scripts/niri-gpu-session.sh"
+  local temp_file
+
+  temp_file="$(mktemp)"
+  cat > "${temp_file}" << EOF
+[Desktop Entry]
+Name=${session_name}
+Comment=Niri session (${session_mode} GPU mode)
+Exec=${wrapper} ${session_mode}
+Type=Application
+DesktopNames=niri
+EOF
+
+  sudo install -m 644 "${temp_file}" "${target_dir}/${file_name}"
+  rm -f "${temp_file}"
+}
+
+install_gpu_session_entries() {
+  local intel_name amd_name nvidia_name
+  local sessions_dir="${WAYLAND_SESSIONS_DIR}"
+  local wrapper="${HOME}/.config/scripts/niri-gpu-session.sh"
+
+  if [[ ! -f "${wrapper}" ]]; then
+    warn "GPU session wrapper not found at ${wrapper}. Skipping SDDM GPU entries."
+    return 1
+  fi
+
+  chmod +x "${wrapper}" || true
+
+  intel_name="${DETECTED_GPU_INTEL_NAME:-}"
+  amd_name="${DETECTED_GPU_AMD_NAME:-}"
+  nvidia_name="${DETECTED_GPU_NVIDIA_NAME:-}"
+
+  if [[ -z "${intel_name}" ]]; then
+    intel_name="$(detect_gpu_name_by_vendor 'Intel')"
+  fi
+  if [[ -z "${amd_name}" ]]; then
+    amd_name="$(detect_gpu_name_by_vendor 'AMD|Advanced Micro Devices|ATI')"
+  fi
+  if [[ -z "${nvidia_name}" ]]; then
+    nvidia_name="$(detect_gpu_name_by_vendor 'NVIDIA')"
+  fi
+
+  if ! sudo install -d -m 755 "${sessions_dir}" >> "${LOG_FILE}" 2>&1; then
+    warn "Failed to create ${sessions_dir}. Skipping GPU-specific SDDM entries."
+    return 1
+  fi
+
+  create_wayland_session_entry "niri-auto.desktop" "Niri-Auto" "auto" "${sessions_dir}"
+  if [[ -n "${intel_name}" ]]; then
+    create_wayland_session_entry "niri-intel.desktop" "Niri-Intel (${intel_name})" "intel" "${sessions_dir}"
+  fi
+  if [[ -n "${nvidia_name}" ]]; then
+    create_wayland_session_entry "niri-nvidia.desktop" "Niri-NVIDIA (${nvidia_name})" "nvidia" "${sessions_dir}"
+  fi
+  if [[ -n "${amd_name}" ]]; then
+    create_wayland_session_entry "niri-amd.desktop" "Niri-AMD (${amd_name})" "amd" "${sessions_dir}"
+  fi
+
+  add_summary "Installed SDDM GPU session entries in ${sessions_dir}"
+  msg "Installed SDDM GPU session entries (auto/intel/nvidia/amd when detected)."
+}
+
 configure_docker_access() {
   if [[ "${INSTALL_DOCKER}" != "true" ]]; then
     info "Docker was not selected. Skipping Docker service setup."
