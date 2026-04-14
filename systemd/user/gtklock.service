@@ -4,5 +4,5 @@ Documentation=man:gtklock(1)
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/gtklock
+ExecStart=%h/.config/scripts/lock-screen.sh
 Restart=no

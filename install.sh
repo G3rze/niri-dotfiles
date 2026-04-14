@@ -80,6 +80,7 @@ readonly CONFIG_FOLDERS=(
   niri waybar fish zsh fastfetch mako alacritty kitty starship
   nvim yazi gtklock zathura wallust rofi scripts mpd rmpc anytype
 )
+readonly LOCAL_BIN_DIR="${HOME}/.local/bin"
 
 # Optional dependencies that waybar modules depend on
 readonly OPTIONAL_AUDIO_PACKAGES=("pulseaudio" "pipewire-pulse")
@@ -108,7 +109,8 @@ readonly PACMAN_PACKAGES=(
   zathura zathura-pdf-mupdf ttf-jetbrains-mono-nerd
   noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
   qt5-wayland qt6-wayland polkit-gnome ffmpeg imagemagick unzip jq
-  gtklock rofi curl libnotify brightnessctl firefox hyprpicker playerctl awww mpd rmpc
+  gtklock gtklock-userinfo-module rofi curl libnotify brightnessctl firefox hyprpicker playerctl awww mpd rmpc
+  cliphist wl-clipboard
   blueman network-manager-applet bottom thunar pavucontrol
 )
 
@@ -1613,6 +1615,7 @@ create_systemd_services() {
   printf "  - awww-daemon\n"
   printf "  - waybar\n"
   printf "\n"
+  initialize_lockscreen_assets
   info "Creating gtklock service for manual/idle trigger only..."
 
   local service_dir="${HOME}/.config/systemd/user"
@@ -1690,6 +1693,44 @@ create_systemd_services() {
   msg "Systemd services configured."
 }
 
+initialize_lockscreen_assets() {
+  local lock_bg_script="${HOME}/.config/scripts/update-lockscreen-background.sh"
+  local lock_theme_script="${HOME}/.config/scripts/update-gtklock-theme.sh"
+
+  if [[ -x "${lock_theme_script}" ]]; then
+    if "${lock_theme_script}" >> "${LOG_FILE}" 2>&1; then
+      info "Initialized gtklock theme styling."
+    else
+      warn "Failed to initialize gtklock theme styling."
+    fi
+  fi
+
+  if [[ -x "${lock_bg_script}" ]]; then
+    if "${lock_bg_script}" >> "${LOG_FILE}" 2>&1; then
+      info "Initialized gtklock background cache."
+    else
+      warn "Failed to initialize gtklock background cache."
+    fi
+  fi
+}
+
+install_cli_binaries() {
+  local repo_bin_dir="${DOTDIR}/bin"
+  local source_binary="${repo_bin_dir}/gerzeos"
+  local target_binary="${LOCAL_BIN_DIR}/gerzeos"
+
+  if [[ ! -f "${source_binary}" ]]; then
+    warn "CLI binary not found at ${source_binary}, skipping gerzeos install."
+    return 1
+  fi
+
+  mkdir -p "${LOCAL_BIN_DIR}"
+  chmod +x "${source_binary}" "${DOTDIR}/scripts/set-profile-picture.sh"
+  ln -sfn "${source_binary}" "${target_binary}"
+  info "Installed CLI command: ${target_binary}"
+  return 0
+}
+
 create_gtklock_service() {
   local service_dir="$1"
 
@@ -1698,8 +1739,7 @@ create_gtklock_service() {
     return
   fi
 
-  local gtklock_bin
-  gtklock_bin="$(command -v gtklock)"
+  local lock_script="${HOME}/.config/scripts/lock-screen.sh"
 
   cat > "${service_dir}/gtklock.service" << EOF
 [Unit]
@@ -1708,7 +1748,7 @@ Documentation=man:gtklock(1)
 
 [Service]
 Type=simple
-ExecStart=${gtklock_bin}
+ExecStart=${lock_script}
 Restart=no
 EOF
 
@@ -1902,6 +1942,10 @@ main() {
   step "Creating Symbolic Links"
   create_symlinks
   add_summary "Configuration symlinks created in ~/.config"
+
+  step "Installing CLI Helpers"
+  install_cli_binaries
+  add_summary "CLI helper installed: ~/.local/bin/gerzeos"
 
   step "Applying Keyboard and Language"
   apply_keyboard_and_language_config

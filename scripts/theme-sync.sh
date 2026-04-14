@@ -735,6 +735,21 @@ main() {
     log_info "Theme unchanged, skipping all theming operations"
     log_success "Wallpaper applied, no theme changes needed"
   fi
+
+  if [[ -x "$HOME/.config/scripts/update-lockscreen-background.sh" ]]; then
+    "$HOME/.config/scripts/update-lockscreen-background.sh" "$wallpaper_path" >/dev/null 2>&1 ||
+      log_warn "Failed to refresh lockscreen background"
+  fi
+
+  if [[ -x "$HOME/.config/scripts/update-gtklock-theme.sh" ]]; then
+    "$HOME/.config/scripts/update-gtklock-theme.sh" >/dev/null 2>&1 ||
+      log_warn "Failed to refresh gtklock theme"
+  fi
+
+  if [[ -x "$HOME/.config/scripts/update-sddm-theme.sh" ]]; then
+    "$HOME/.config/scripts/update-sddm-theme.sh" "$wallpaper_path" >/dev/null 2>&1 ||
+      log_warn "Failed to refresh SDDM theme assets"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

@@ -2,6 +2,8 @@
 spawn-sh-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &"
 spawn-at-startup "awww-daemon"
 spawn-at-startup "waybar"
+spawn-sh-at-startup "wl-paste --type text --watch cliphist store &"
+spawn-sh-at-startup "wl-paste --type image --watch cliphist store &"
 
 // General Settings
 prefer-no-csd
@@ -53,11 +55,13 @@ binds {
     MOD+RETURN                          hotkey-overlay-title="Open Terminal: kitty" { spawn-sh "kitty"; }
     MOD+ALT+RETURN                      hotkey-overlay-title="Open Terminal: alacritty" { spawn-sh "alacritty"; }
     MOD+ALT+B                         hotkey-overlay-title="Open Secondary Browser" { spawn-sh "$HOME/.config/scripts/open-browser.sh secondary"; }
-    MOD+SHIFT+Q                         hotkey-overlay-title="Lock Screen: gtklock" { spawn-sh "gtklock"; }
+    MOD+SHIFT+Q                         hotkey-overlay-title="Lock Screen: gtklock" { spawn-sh "$HOME/.config/scripts/lock-screen.sh"; }
+    MOD+SHIFT+E                         hotkey-overlay-title="Logout Session: SDDM" { spawn-sh "$HOME/.config/scripts/logout-session.sh"; }
     MOD+A                               hotkey-overlay-title="Open App Launcher: rofi" { spawn-sh "rofi -show drun"; }
     MOD+B                              hotkey-overlay-title="Open Browser" { spawn-sh "$HOME/.config/scripts/open-browser.sh primary"; }
     MOD+E                               hotkey-overlay-title="Open File Manager" { spawn-sh "$HOME/.config/scripts/open-file-manager.sh"; }
     MOD+ALT+E                           hotkey-overlay-title="File Manager: Yazi" { spawn-sh "yazi"; }
+    MOD+V                               hotkey-overlay-title="Clipboard History: rofi + cliphist" { spawn-sh "$HOME/.config/scripts/clipboard-menu.sh"; }
     MOD+W                               hotkey-overlay-title="Open Wallpaper Selector" { spawn-sh "$HOME/.config/scripts/bgselector.sh"; }
 
     // Media Keys
@@ -208,12 +212,12 @@ layout {
 
     focus-ring {
         width 0
-        active-color "#282828"
+        active-color "#1E1E2E"
     }
 
     insert-hint {
         off
-        color "#282828"
+        color "#1E1E2E"
     }
 
     struts {}

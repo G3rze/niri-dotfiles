@@ -166,6 +166,65 @@ Development Tools
 
 Thanks to [vinceliuice](https://github.com/vinceliuice) and [Fausto-Korpsvart](https://github.com/Fausto-Korpsvart) for providing awesome GTK themes.
 
+## Dynamic SDDM
+
+This repo includes an optional dynamic SDDM setup based on `sddm-silent-theme`.
+
+How it works:
+
+- Install `sddm-silent-theme`
+- A one-time root bootstrap clones that theme into `/var/lib/sddm/silent-dynamic`
+- SDDM reads the registered theme through `/usr/share/sddm/themes/silent-dynamic`
+- After that, wallpaper and color updates are written by your user account, not by `sudo`
+- `theme-sync.sh` refreshes `backgrounds/dynamic.jpg` and rewrites `configs/default.conf` automatically whenever the wallpaper changes
+
+Bootstrap command:
+
+```bash
+yay -S sddm-silent-theme
+sudo ~/.config/scripts/bootstrap-sddm-theme.sh
+~/.config/scripts/update-sddm-theme.sh
+```
+
+Notes:
+
+- This is intentionally low-sudo: root is only needed for package install and the one-time bootstrap
+- The dynamic assets live outside your home so the `sddm` user can read them safely
+- The setup keeps the SilentSDDM default layout and behavior, and only makes the background and colors dynamic
+- `gtklock` is styled to mirror the same centered card, wallpaper treatment, wallust-derived colors, and user avatar/name presentation as the active SDDM theme
+
+### Profile Picture Command
+
+The installer also exposes a small helper command:
+
+```bash
+gerzeos --set-profile-picture <path>
+```
+
+This command updates the profile picture used by both `gtklock` and SDDM.
+It center-crops the source image to a square, resizes it to `256x256`, then writes it to:
+
+- `/var/lib/AccountsService/icons/<user>`
+- `/var/lib/AccountsService/users/<user>`
+- `/usr/share/sddm/faces/<user>.face.icon`
+
+Help:
+
+```bash
+gerzeos -h
+gerzeos --help
+```
+
+Supported formats:
+
+- Any format readable by ImageMagick `magick`
+- Common formats: `png`, `jpg`, `jpeg`, `webp`, `bmp`, `tif`, `tiff`, `gif`, `avif`
+
+Note:
+
+- The image conversion runs as your user
+- The final install step requires `sudo` because it writes system avatar paths
+
 ## Preconfigured Tools
 
 - Neovim
@@ -229,6 +288,8 @@ https://www.lazyvim.org/keymaps
 | Keybind                | Action                                |
 | ---------------------- | ------------------------------------- |
 | `MOD + Shift + Escape` | Show hotkey overlay (shortcuts panel) |
+| `MOD + Shift + E`      | Log out current Niri session          |
+| `MOD + Shift + Q`      | Lock screen                           |
 
 ### Applications
 
@@ -241,8 +302,19 @@ https://www.lazyvim.org/keymaps
 | `MOD + A`            | Toggle application launcher (Vicinae)            |
 | `MOD + E`            | Open file manager (Thunar)                       |
 | `MOD + Alt + E`      | Open TUI file manager (Yazi)                     |
+| `MOD + V`            | Open clipboard history                           |
 | `MOD + W`            | Open wallpaper selector                          |
 | `MOD + Shift + Q`    | Lock screen (GTKLock)                            |
+
+### Session
+
+Logout command:
+
+```bash
+~/.config/scripts/logout-session.sh
+```
+
+This terminates the current graphical `niri` session and returns to SDDM.
 
 ### Media Controls
 

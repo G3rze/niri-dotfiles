@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+resolve_script_path() {
+  local source="${BASH_SOURCE[0]}"
+  while [[ -L "${source}" ]]; do
+    local dir
+    dir="$(cd "$(dirname "${source}")" && pwd)"
+    source="$(readlink "${source}")"
+    [[ "${source}" != /* ]] && source="${dir}/${source}"
+  done
+  cd "$(dirname "${source}")" && pwd
+}
+
+readonly SCRIPT_DIR="$(resolve_script_path)"
+readonly DOTFILES_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+readonly PROFILE_HELPER="${DOTFILES_DIR}/scripts/set-profile-picture.sh"
+
+print_help() {
+  cat <<'EOF'
+gerzeos - small helper CLI for local system tweaks
+
+Usage:
+  gerzeos --set-profile-picture <path>
+  gerzeos -h
+  gerzeos --help
+
+Commands:
+  --set-profile-picture <path>
+      Set one profile picture for both SDDM and gtklock.
+      The image is center-cropped to a square and resized to 256x256.
+
+Supported image formats:
+  Any format readable by ImageMagick's 'magick' command.
+  Common formats: .png .jpg .jpeg .webp .bmp .tif .tiff .gif .avif
+
+Notes:
+  This command updates:
+    /var/lib/AccountsService/icons/<user>
+    /var/lib/AccountsService/users/<user>
+    /usr/share/sddm/faces/<user>.face.icon
+  Root access is required for the final install step.
+EOF
+}
+
+main() {
+  if [[ $# -eq 0 ]]; then
+    print_help
+    exit 0
+  fi
+
+  case "${1}" in
+    --set-profile-picture)
+      shift
+      if [[ $# -ne 1 ]]; then
+        printf 'error: --set-profile-picture requires exactly one path\n' >&2
+        print_help >&2
+        exit 1
+      fi
+      exec "${PROFILE_HELPER}" "$1"
+      ;;
+    -h|--help)
+      print_help
+      ;;
+    *)
+      printf 'error: unknown argument: %s\n' "${1}" >&2
+      print_help >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

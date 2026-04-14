@@ -2,4 +2,125 @@ window {
    background-size: cover;
    background-repeat: no-repeat;
    background-position: center;
+   background-color: #1E1E2E;
+}
+
+#window-box {
+   padding: 24px;
+   spacing: 16px;
+}
+
+#auth-card {
+   min-width: 392px;
+   padding: 28px;
+   border-radius: 20px;
+   border: 2px solid #1E1E2E;
+   background-color: alpha(#1E1E2E, 0.78);
+   box-shadow: 0 18px 60px alpha(black, 0.35);
+}
+
+#info-box {
+   margin-bottom: 2px;
+}
+
+#user-revealer {
+   margin-top: 40px;
+}
+
+#user-box {
+   spacing: 10px;
+}
+
+#user-image {
+   border: 2px solid #1E1E2E;
+   box-shadow: 0 12px 36px alpha(black, 0.25);
+}
+
+#user-name {
+   color: #CDD6F4;
+   font-family: "RedHatDisplay", "JetBrainsMono Nerd Font", sans-serif;
+   font-size: 13pt;
+   font-weight: 700;
+}
+
+#clock-label {
+   color: #CDD6F4;
+   font-family: "RedHatDisplay", "JetBrainsMono Nerd Font", sans-serif;
+   font-size: 54pt;
+   font-weight: 800;
+}
+
+#date-label {
+   color: #BAC2DE;
+   font-family: "RedHatDisplay", "JetBrainsMono Nerd Font", sans-serif;
+   font-size: 14pt;
+   font-weight: 600;
+}
+
+#input-label,
+#warning-label,
+#error-label,
+#message-box label {
+   color: #BAC2DE;
+   font-family: "RedHatDisplay", "JetBrainsMono Nerd Font", sans-serif;
+   font-size: 11pt;
+}
+
+#input-field {
+   padding: 0 14px;
+   border-radius: 10px;
+   border-top: 1px solid #585B70;
+   border-bottom: 1px solid #585B70;
+   border-left: 1px solid #585B70;
+   border-right: none;
+   color: #CDD6F4;
+   caret-color: #CDD6F4;
+   background-color: alpha(#45475A, 0.72);
+   box-shadow: none;
+}
+
+#input-field image {
+   color: #CDD6F4;
+}
+
+#unlock-button {
+   padding: 0 18px;
+   border-radius: 10px;
+   border: 1px solid #1E1E2E;
+   background-image: none;
+   background-color: #89B4FA;
+   color: #1E1E2E;
+   font-family: "RedHatDisplay", "JetBrainsMono Nerd Font", sans-serif;
+   font-size: 11pt;
+   font-weight: 700;
+   box-shadow: none;
+}
+
+#unlock-button:hover,
+#unlock-button:focus {
+   background-color: #94E2D5;
+   color: #1E1E2E;
+}
+
+#unlock-button:active {
+   background-color: #F5C2E7;
+}
+
+#status-box {
+   margin-top: 4px;
+}
+
+#warning-label {
+   color: #f9e2af;
+}
+
+#error-label {
+   color: #f38ba8;
+}
+
+#message-scrolled-window,
+#message-scrolled-window viewport {
+   background: transparent;
+   border: none;
+   box-shadow: none;
 }
