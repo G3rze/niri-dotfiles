@@ -101,6 +101,7 @@ readonly AUR_PACKAGES=(
   pavucontrol
   thunar
   minizip
+  xpadneo
 )
 
 # Official repository packages
@@ -112,6 +113,7 @@ readonly PACMAN_PACKAGES=(
   gtklock gtklock-userinfo-module rofi curl libnotify brightnessctl firefox hyprpicker playerctl awww mpd rmpc
   cliphist wl-clipboard
   blueman network-manager-applet bottom thunar pavucontrol
+  udisks2 udiskie gvfs thunar-volman tumbler
 )
 
 # ==========================
@@ -1614,6 +1616,7 @@ create_systemd_services() {
   printf "  - polkit-gnome-authentication-agent\n"
   printf "  - awww-daemon\n"
   printf "  - waybar\n"
+  printf "  - udiskie\n"
   printf "\n"
   initialize_lockscreen_assets
   info "Creating gtklock service for manual/idle trigger only..."
@@ -1640,6 +1643,17 @@ create_systemd_services() {
     fi
   else
     info "mpd is not installed. Skipping user service enable."
+  fi
+
+  if verify_binary udisksctl; then
+    info "Enabling udisks2 system service for removable media automount support..."
+    if sudo systemctl enable --now udisks2.service >> "${LOG_FILE}" 2>&1; then
+      add_summary "udisks2 system service enabled"
+    else
+      warn "Failed to enable/start udisks2.service. Automount may require manual mounting."
+    fi
+  else
+    info "udisksctl is not installed. Skipping udisks2 service enable."
   fi
 
   local reply
@@ -1804,9 +1818,10 @@ EOF
   printf "\n"
   printf "${BLUE}${BOLD}Important Notes:${NC}\n"
   printf "  • Services are auto-started by niri.conf, not systemd\n"
-  printf "  • awww-daemon, waybar, and polkit start automatically\n"
+  printf "  • awww-daemon, waybar, udiskie, and polkit start automatically\n"
   printf "  • Niri auto-starts from the installed fish/zsh config only on tty1\n"
   printf "  • mpd is enabled as a user service if installed successfully\n"
+  printf "  • udisks2 is enabled as a system service for removable media mounts\n"
   printf "  • waydroid-container can be enabled during install (optional)\n"
   printf "  • syncthing can be installed/enabled during install (optional)\n"
   printf "  • gtklock can be triggered manually or via idle timeout\n"
@@ -1899,7 +1914,7 @@ main() {
 
   step "Installing AUR Packages"
   install_aur_packages
-  add_summary "AUR packages installed (wallust)"
+  add_summary "AUR packages installed"
 
   step "Installing GTK Themes"
   install_gtk_themes
